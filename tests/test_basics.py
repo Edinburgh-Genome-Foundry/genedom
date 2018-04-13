@@ -1,4 +1,6 @@
 import os
+import matplotlib
+matplotlib.use("Agg")
 from genedom import load_records, batch_domestication, BUILTIN_DOMESTICATORS
 
 DATA_DIR = os.path.join("tests", "data")
