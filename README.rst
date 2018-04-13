@@ -17,6 +17,7 @@
 GeneDom is a python library for managing the domestication of genetic parts so that they will comply to a genetic assembly standard. It puts together a `sequence optimizer <https://github.com/Edinburgh-Genome-Foundry/DnaChisel>`_, genetic standards data, and a reporting system, to automate the domestication of large batches in an easy and human-friendly way.
 
 Features include:
+
 - Possibility to define parts domesticators with added right-hand and left-hand nucleotide, hard constraints on the sequence (such as absence of a restriction site) and optimization objectives (such as codon optimization).
 - Built-in pre-defined domesticators for popular genetic assembly standards (well, only EMMA at the moment).
 - Routine for mass-domesticating sequences with report generation
@@ -45,5 +46,5 @@ Licence
 
 Genedom is an open-source software originally written at the `Edinburgh Genome Foundry
 <http://www.genomefoundry.org>`_ by `Zulko <https://github.com/Zulko>`_
-and `released on Github <https://github.com/Edinburgh-Genome-Foundry/Geneblocks>`_ under the MIT licence (copyright Edinburgh Genome Foundry).
+and `released on Github <https://github.com/Edinburgh-Genome-Foundry/genedom>`_ under the MIT licence (copyright Edinburgh Genome Foundry).
 Everyone is welcome to contribute !
