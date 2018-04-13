@@ -1,0 +1,110 @@
+#sidebar: p {{genedom_sidebar_text}}
+
+.logos
+  img(src="file:///{{ genedom_logo_url }}")
+  img(src="file:///{{ egf_logo_url }}")
+
+hr
+h1 Part domestication report
+hr
+
+h2  Summary Table 
+
+{{ summary_table }}
+
+h2 Domesticators
+
+each domesticator in domesticators
+  .ui.segment.raised
+    .ui.title.ribbon.label.teal {{domesticator.name}}
+    .description {{ domesticator.html_details() }}
+//- 
+//- p.
+//-    This table summarizes which tests passed (green) or failed (red)
+//- 
+//- table.ui.compact.celled.striped.table.groups.definition.summary-table
+//-  thead
+//-    tr
+//-      th
+//-      each screening_method in all_screenings
+//-        th {{ screening_method.name }}
+//-  tbody
+//-    each record_id, screenings in screening_results.items()
+//-      tr
+//-        th {{ record_id }} 
+//-        each screening, scr_result in screenings.items()
+//-          td(class="{{  status_dict[scr_result.status]['class'] }} {{'ui tall stacked segment' if screening.is_aggregator else '' }}")
+//-            .icon
+//-              a(href='#results-{{record_id}}-{{screening.link_name}}') {{  status_dict[scr_result.status]['icon'] }}
+//- 
+//- h2  Domesticators
+//- 
+//- each record_id, scr_results in screening_results.items()
+//-   .ui.segment.raised
+//-     .ui.title.ribbon.label(class="{{ status_dict[list(scr_results.values())[-1].status]['color'] }}")
+//-       span {{ status_dict[list(scr_results.values())[-1].status]['icon'] }} &nbsp; {{record_id}}
+//-     table.ui.compact.celled.striped.table.groups
+//-       thead
+//-         tr
+//-           th Screening
+//-           th Infos
+//-       tbody
+//-         each screening, result in scr_results.items()
+//-           tr(class="{{status_dict[result.status]['class']}}"
+//-              id='results-{{record_id}}-{{screening.link_name}}')
+//-             td() {{ screening }}
+//-             td {{screening.test.test_results_to_html_message(result)}}
+//- 
+//- h1.appendix  APPENDIX
+//- hr
+//- 
+//- h2  Sequences and screening definitions 
+//- 
+//- h3  Sequences details 
+//- p.
+//-   Here are the sequences submitted. The MD5 hash is provided to identify sequences:
+//-   if two sequences, even accross reports, have the same hash, then they are almost
+//-   certainly the same sequence.
+//- 
+//- {{ sequences_details_table }}
+//- 
+//- h3  Preprocessings 
+//- 
+//- each preprocessing in preprocessing_data
+//-   .ui.segment.raised
+//-     .ui.title.ribbon.label(id='preprocessing-details-{{preprocessing.link_name}}') {{preprocessing}}
+//-     .description !{preprocessing.html_description()}
+//- 
+//- h3  Screening Tests 
+//- 
+//- each test in all_screening_tests
+//-   .ui.segment.raised
+//-     .ui.title.ribbon.label(id='screening-test-details-{{test.link_name}}') {{test}}
+//-     .description !{ test.html_description() }
+//- 
+//- h3  Screenings
+//- 
+//- each screening in all_screenings
+//-   .ui.segment.raised
+//-     .ui.title.ribbon.label(id='screening-test-details-{{screening.link_name}}') {{screening}}
+//-     .description !{ screening.html_description() }
+//- 
+//- if include_details
+//- 
+//-   h2  Detailed Screening Results 
+//- 
+//-   each record_id, scr_results in screening_results.items()
+//-     h3(id='resultsdetails-{{record_id}}')  Sequence: {{record_id}}
+//-     each screening, test_results in scr_results.items()
+//-       .ui.segment.raised
+//-         .ui.title.ribbon.label(id='results-details-{{record_id}}-{{screening.link_name}}') {{screening.name}} ({{test_results.status}})
+//-         .description !{screening.test.test_results_to_html(test_results)}
+//- 
+//-   h2 Preprocessing results 
+//- 
+//-     each preprocessing, records_data in preprocessing_data.items()
+//-       h3(id='preprocdetails-{{preprocessing.link_name}}') {{preprocessing}}
+//-       each record, data in records_data.items()
+//-         .ui.segment.raised
+//-           .ui.title.ribbon.label(id='preprocdetails-{{preprocessing.link_name}}-{{record}}') {{record}}
+//-           .description !{preprocessing.preprocessing_data_to_html(data)}
