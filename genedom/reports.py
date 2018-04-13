@@ -46,8 +46,10 @@ def domestication_report(target, domestication_infos, domesticators):
         tds = list(tr.find_all("td"))
         if len(tds) == 0:
             return
-        name, dom, success, added, edited = tds
-        if "Failed" in success.text:
+        if len(tds) == 3:
+            print (tds)
+        name, dom, final, added, edited = tds
+        if "Failed" in final.text:
             add_css_class(tr, "negative")
         if edited.text != "0":
             add_css_class(edited, "warning")
