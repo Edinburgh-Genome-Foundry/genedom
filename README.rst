@@ -46,5 +46,5 @@ Licence
 
 Genedom is an open-source software originally written at the `Edinburgh Genome Foundry
 <http://www.genomefoundry.org>`_ by `Zulko <https://github.com/Zulko>`_
-and `released on Github <https://github.com/Edinburgh-Genome-Foundry/Geneblocks>`_ under the MIT licence (copyright Edinburgh Genome Foundry).
+and `released on Github <https://github.com/Edinburgh-Genome-Foundry/genedom>`_ under the MIT licence (copyright Edinburgh Genome Foundry).
 Everyone is welcome to contribute !
