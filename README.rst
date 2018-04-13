@@ -9,10 +9,8 @@
   :target: https://travis-ci.org/Edinburgh-Genome-Foundry/genedom
   :alt: Travis CI build status
 
-.. image:: https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/genedom/master/docs/_static/images/title.png
-   :alt: [logo]
-   :align: center
-   :width: 500px
+.. image:: https://coveralls.io/repos/github/Edinburgh-Genome-Foundry/genedom/badge.svg?branch=master
+  :target: https://coveralls.io/github/Edinburgh-Genome-Foundry/genedom?branch=master
 
 
 
