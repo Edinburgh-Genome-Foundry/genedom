@@ -14,4 +14,4 @@ setup(name='genedom',
     keywords="genetic DNA part standardization synthetic biology",
     packages= find_packages(exclude='docs'),
     install_requires=("dnachisel", "snapgene_reader", "pdf_reports",
-                      "pandas"))
+                      "pandas", "dna_features_viewer"))
