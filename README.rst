@@ -14,7 +14,7 @@
 
 
 
-GeneDom is a python library for managing the domestication of genetic parts so that they will comply to a genetic assembly standard. It puts together a `sequence optimizer <https://github.com/Edinburgh-Genome-Foundry/DnaChisel>`_, genetic standards data, and a reporting system, to automate the domestication of large batches in an easy and human-friendly way.
+GeneDom is a python library for managing the domestication of genetic parts (i.e. the modification of their sequence so as to make them compatible with a given genetic assembly standard). Genedom binds together a `sequence optimizer <https://github.com/Edinburgh-Genome-Foundry/DnaChisel>`_, genetic standards informations, and a reporting routines, to automate the domestication of large batches in an easy and human-friendly way.
 
 Features include:
 
