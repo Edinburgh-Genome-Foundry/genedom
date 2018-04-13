@@ -13,4 +13,4 @@ setup(name='genedom',
     license='see LICENSE.txt',
     keywords="genetic DNA part standardization synthetic biology",
     packages= find_packages(exclude='docs'),
-    install_requires("dnachisel", "snapgene_reader", "pdf_reports"))
+    install_requires=("dnachisel", "snapgene_reader", "pdf_reports"))
