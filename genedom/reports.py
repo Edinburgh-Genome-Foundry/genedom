@@ -19,8 +19,8 @@ from .version import __version__
 
 THIS_PATH = os.path.dirname(os.path.realpath(__file__))
 ASSETS_PATH = os.path.join(THIS_PATH, "reports_assets")
-DOMESTICATION_REPORT_TEMPLATE = os.path.join(
-    ASSETS_PATH, "domestication_report.pug")
+DOMESTICATION_REPORT_TEMPLATE = os.path.join(ASSETS_PATH,
+                                             "domestication_report.pug")
 STYLESHEET = os.path.join(ASSETS_PATH, 'report_style.css')
 
 
@@ -46,7 +46,7 @@ def domestication_report(target, domestication_infos, domesticators):
         tds = list(tr.find_all("td"))
         if len(tds) == 0:
             return
-        name, dom, final, added, edited = tds
+        name, order_id, dom, final, added, edited = tds
         if "Failed" in final.text:
             add_css_class(tr, "negative")
         if edited.text != "0":

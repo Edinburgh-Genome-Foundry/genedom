@@ -9,6 +9,7 @@ from sequenticon import sequenticon
 
 from .PartDomesticator import PartDomesticator
 from .reports import domestication_report
+from .biotools import sanitize_and_uniquify
 
 def batch_domestication(records, domesticator, target, allow_edits=False,
                         domesticate_suffix="",
@@ -31,6 +32,9 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
 
     domesticators = set()
     nfails = 0
+    domesticated_records = []
+    columns = ["Record", "Ordering Name", "Domesticator",
+               "Domesticated Record", "Added bp", "Edited bp"]
     for record in logger.iter_bar(record=records):
         record = deepcopy(record)
         original_id = record.id
@@ -48,8 +52,10 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
             record, report_target=report_target, edit=allow_edits)
         if not success:
             nfails += 1
-        final.id = new_id[:20]
+        final.original_id = original_id
+        final.id = new_id[:20].replace(' ', '_')
         SeqIO.write(final, domesticated_dir._file(new_id + ".gb"), "genbank")
+        domesticated_records.append(final)
         if include_original_records:
             record.id = record.id[:20]
             SeqIO.write(final, original_dir._file(original_id + ".gb"),
@@ -59,15 +65,48 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
         added_bp = len(final) - len(record)
         before_seqicon = sequenticon(record, output_format="html_image")
         after_seqicon = sequenticon(final, output_format="html_image")
-        columns = ["Record", "Domesticator", "Domesticated Record", "Added bp",
-                   "Edited bp"]
-        infos.append([
-            before_seqicon + record.id,
-            record_domesticator.name,
-            ("Failed: " + msg) if not success else (after_seqicon + new_id),
-            added_bp, n_edits])
+
+        infos.append({
+            "id": original_id,
+            "Record": before_seqicon + original_id,
+            "Domesticator": record_domesticator.name,
+            "Domesticated Record": ("Failed: " + msg) if not success
+                                   else (after_seqicon + new_id),
+            "Added bp": added_bp,
+            "Edited bp": n_edits
+        })
+    sanitizing_table = sanitize_and_uniquify([info['id'] for info in infos])
+    order_id_dataframe = pandas.DataFrame(list(sanitizing_table.items()),
+                                          columns=["sequence", "order_id"])
+    order_id_dataframe.to_csv(root._file("order_ids.csv").open('w'),
+                              index=False)
+    for info in infos:
+        info['Order ID'] = sanitizing_table[info['id']]
+    columns = ["Record", "Order ID", "Domesticator",
+               "Domesticated Record", "Added bp", "Edited bp"]
     infos_dataframe = pandas.DataFrame(infos, columns=columns)
+    infos_dataframe.sort_values('Order ID', inplace=True)
     domesticators = sorted(domesticators, key=lambda d: d.name)
     domestication_report(root._file("Report.pdf"), infos_dataframe,
                          domesticators)
+    order_dir = root._dir('sequences_to_order', replace=True)
+    for r in domesticated_records:
+        r.id = sanitizing_table[r.original_id]
+        r.name = ''
+        r.description = ''
+    SeqIO.write(domesticated_records, order_dir._file("sequences_to_order.fa"),
+                "fasta")
+    df = pandas.DataFrame.from_records(
+        sorted([
+            {'sequence': str(rec.seq).upper(),
+             'length': len(rec),
+             'sequence name': rec.id}
+            for rec in domesticated_records
+        ], key=lambda d: d['sequence name']),
+        columns=['sequence name', 'length', 'sequence']
+    )
+    df.to_excel(order_dir._file("sequences_to_order.xls").open("wb"),
+                index=False)
+    df.to_csv(order_dir._file("all_domesticated_parts.csv").open("w"),
+              index=False)
     return nfails, root._close()

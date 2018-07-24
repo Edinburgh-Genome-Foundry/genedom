@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import re
 
 from snapgene_reader import snapgene_file_to_seqrecord
 
@@ -11,6 +12,7 @@ from Bio import SeqIO
 
 
 complements_dict = {"A": "T", "T": "A", "C": "G", "G": "C"}
+
 
 def random_dna_sequence(length, probas=None, seed=None):
     """Return a random DNA sequence ("ATGGCGT...") with the specified length.
@@ -41,12 +43,14 @@ def random_dna_sequence(length, probas=None, seed=None):
         sequence = np.random.choice(bases, length, p=probas)
     return "".join(sequence)
 
+
 formats_dict = {
-  '.fa': 'fasta',
-  '.gb': 'genbank',
-  '.gbk': 'genbank',
-  '.dna': 'snapgene'
+    '.fa': 'fasta',
+    '.gb': 'genbank',
+    '.gbk': 'genbank',
+    '.dna': 'snapgene'
 }
+
 
 def load_record(filename, linear=True, name="unnamed", capitalize=True):
     no_extension, extension = os.path.splitext(filename)
@@ -62,6 +66,7 @@ def load_record(filename, linear=True, name="unnamed", capitalize=True):
     record.name = name.replace(" ", "_")[:20]
 
     return record
+
 
 def load_records(path, capitalize=True):
     if isinstance(path, (list, tuple)):
@@ -81,15 +86,19 @@ def load_records(path, capitalize=True):
                 record.id += "_%04d" % i
     return records
 
+
 def complement(sequence):
     return "".join(complements_dict[c] for c in sequence)
+
 
 def reverse_complement(sequence):
     return complement(sequence)[::-1]
 
+
 def sequence_to_record(sequence, features=()):
     return SeqRecord(Seq(sequence, alphabet=DNAAlphabet()),
                      features=list(features))
+
 
 def annotate_record(seqrecord, location="full", feature_type="feature",
                     margin=0, **qualifiers):
@@ -115,7 +124,7 @@ def annotate_record(seqrecord, location="full", feature_type="feature",
     """
 
     if location == "full":
-        location = (margin, len(seqrecord)-margin)
+        location = (margin, len(seqrecord) - margin)
 
     strand = location[2] if len(location) == 3 else 1
     seqrecord.features.append(
@@ -125,3 +134,30 @@ def annotate_record(seqrecord, location="full", feature_type="feature",
             type=feature_type
         )
     )
+
+
+import re
+
+
+def sanitize_string(string, max_length=15,
+                    replacements=(("'", "p"), ("*", "s"), ("-", "_"))):
+    for old, new in replacements:
+        string = string.replace(old, new)
+    string = re.sub(r'[^a-zA-Z\d\S]', '_', string)
+    return string[:max_length]
+
+
+def sanitize_and_uniquify(strings, max_length=15,
+                          replacements=(("'", "p"), ("*", "s"), ("-", "_"))):
+    dejavu = set()
+    table = {}
+    for string in strings:
+        newstring = sanitize_string(string, max_length=max_length,
+                                    replacements=replacements)
+        i = 1
+        while newstring in dejavu:
+            i += 1
+            newstring = newstring[:-1] + str(i)
+        dejavu.add(newstring)
+        table[string] = newstring
+    return table
