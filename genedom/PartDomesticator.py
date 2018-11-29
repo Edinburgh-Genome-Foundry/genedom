@@ -9,7 +9,7 @@ from dnachisel import (AvoidPattern, reverse_complement, reverse_translate,
                        DnaOptimizationProblem, EnforceTranslation,
                        annotate_record, CodonOptimize, Location,
                        sequence_to_biopython_record, random_dna_sequence,
-                       AvoidChanges)
+                       AvoidChanges, AvoidChanges)
 
 from dnachisel.reports import (optimization_with_report,
                                SpecAnnotationsTranslator)
@@ -31,7 +31,8 @@ class PartDomesticator:
 
     def __init__(self, name='unnamed domesticator', left_flank='',
                  right_flank='', constraints=(), objectives=(),
-                 description=None, logger=None):
+                 description=None, simultaneous_mutations = 1,
+                 minimize_edits=True, logger=None):
         if isinstance(left_flank, str):
             left_flank = sequence_to_biopython_record(left_flank)
             annotate_record(left_flank, label='left flank')
@@ -46,7 +47,8 @@ class PartDomesticator:
         self.objectives = list(objectives)
         self.description = description
         self.logger = logger
-        self.simultaneous_mutations = 1
+        self.simultaneous_mutations = simultaneous_mutations
+        self.minimize_edits = minimize_edits
 
     def domesticate(self, dna_sequence=None, protein_sequence=None,
                     is_cds=False, codon_optimization=None,
@@ -78,6 +80,8 @@ class PartDomesticator:
         if codon_optimization:
             objectives.append(CodonOptimize(species=codon_optimization,
                                             location=location))
+        if self.minimize_edits:
+            objectives.append(AvoidChanges())
 
         extended_sequence = self.left_flank + dna_sequence + self.right_flank
 
