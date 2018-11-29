@@ -38,14 +38,15 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
     for record in logger.iter_bar(record=records):
         record = deepcopy(record)
         original_id = record.id
-        new_id = record.id + domesticate_suffix
+        domesticated_id = record.id + domesticate_suffix
+        domesticated_file_name = domesticated_id + ".gb"
         if isinstance(domesticator, PartDomesticator):
             record_domesticator = domesticator
         else:
             record_domesticator = domesticator(record)
         domesticators.add(record_domesticator)
         if include_optimization_reports:
-            report_target = errors_dir._dir(new_id)
+            report_target = errors_dir._dir(record.id)
         else:
             report_target = None
         final, edits, report, success, msg = record_domesticator.domesticate(
@@ -53,8 +54,9 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
         if not success:
             nfails += 1
         final.original_id = original_id
-        final.id = new_id[:20].replace(' ', '_')
-        SeqIO.write(final, domesticated_dir._file(new_id + ".gb"), "genbank")
+        final.id = domesticated_id.replace(' ', '_')
+        SeqIO.write(final, domesticated_dir._file(domesticated_file_name),
+                    "genbank")
         domesticated_records.append(final)
         if include_original_records:
             record.id = record.id[:20]
@@ -71,7 +73,7 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
             "Record": before_seqicon + original_id,
             "Domesticator": record_domesticator.name,
             "Domesticated Record": ("Failed: " + msg) if not success
-                                   else (after_seqicon + new_id),
+                                   else (after_seqicon + domesticated_id),
             "Added bp": added_bp,
             "Edited bp": n_edits
         })

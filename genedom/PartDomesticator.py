@@ -46,6 +46,7 @@ class PartDomesticator:
         self.objectives = list(objectives)
         self.description = description
         self.logger = logger
+        self.simultaneous_mutations = 1
 
     def domesticate(self, dna_sequence=None, protein_sequence=None,
                     is_cds=False, codon_optimization=None,
@@ -88,6 +89,7 @@ class PartDomesticator:
             objectives=objectives,
             logger=self.logger
         )
+        problem.n_mutations = self.simultaneous_mutations
         optimization_successful = True
         message = ""
         if report_target is not None:
