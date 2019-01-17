@@ -102,10 +102,14 @@ class PartDomesticator:
         ----------
 
         dna_sequence
+          The DNA sequence string to domesticate.
         
         protein_sequence
+          Amino-acid sequence of the protein, which will be converted into
+          a DNA sequence string.
         
         is_cds
+          If True, sequence edits are restricted to synonymous mutations.
 
 
         codon_optimization
@@ -117,6 +121,7 @@ class PartDomesticator:
         final_record_target
         
         edit
+          Turn to True to allow any kind of edits
         
         report_target
           Target for the sequence optimization report (a folder path, or a zip
