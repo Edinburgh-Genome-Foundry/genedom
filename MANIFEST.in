@@ -1,4 +1,5 @@
 include *.txt
+include *.rst
 recursive-include examples *.txt *.py
 recursive-include genedom/reports_assets *
 recursive-include genedom/assembly_standards *
