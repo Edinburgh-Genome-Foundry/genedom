@@ -24,14 +24,55 @@ from .biotools import reverse_complement, sequence_to_record, annotate_record
 
 
 def nan_to_empty_string(val):
+    """Return the value unless it is NaN, then it returns an empty string."""
     return val if (isinstance(val, str) or not np.isnan(val)) else ''
 
 
 class PartDomesticator:
+    """Generic domesticator.
+
+    Parameters
+    ----------
+
+    name
+      Domesticator name as it will appear in reports etc.
+    
+    description
+      Short domesticator description as it will appear in reports etc.
+    
+    left_flank
+      String. Left addition to the sequence (homology arms, enzymes sites etc.)
+      
+
+    right_flank
+      String. Right addition to the sequence (homology arms, enz. sites etc.)
+
+    constraints
+      Either Dnachisel constraints or functions (sequence => constraint) to be
+      applied to the sequence for optimization
+
+
+    objectives
+      Either Dnachisel objectives or functions (sequence => objective) to be
+      applied to the sequence for optimization.
+
+    simultaneous_mutations
+      Number of sequences mutations to be applied simulatenously during
+      optimization. A larger number creates more noise but could allow to
+      solve tougher problems.
+
+    minimize_edits
+      If true, the optimizer will attempt to minimize changes while making
+      sure the constraints hold (each edit incurs a penalty of 1 in the
+      total optimization score).
+
+    logger
+      A proglog logger or 'bar' or None for no logger at all.
+    """
 
     def __init__(self, name='unnamed domesticator', left_flank='',
                  right_flank='', constraints=(), objectives=(),
-                 description=None, simultaneous_mutations = 1,
+                 description=None, simultaneous_mutations=1,
                  minimize_edits=True, logger=None):
         if isinstance(left_flank, str):
             left_flank = sequence_to_biopython_record(left_flank)
@@ -56,6 +97,30 @@ class PartDomesticator:
                     final_record_target=None, edit=False,
                     report_target=None):
         """Domesticate a sequence.
+
+        Parameters
+        ----------
+
+        dna_sequence
+        
+        protein_sequence
+        
+        is_cds
+
+
+        codon_optimization
+        
+        extra_constraints
+        
+        extra_objectives
+        
+        final_record_target
+        
+        edit
+        
+        report_target
+          Target for the sequence optimization report (a folder path, or a zip
+          path)
 
         Returns
         -------
