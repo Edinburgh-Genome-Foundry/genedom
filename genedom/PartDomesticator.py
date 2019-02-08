@@ -21,7 +21,7 @@ import matplotlib.cm as cm
 
 
 from .biotools import reverse_complement, sequence_to_record, annotate_record
-
+from .StandardDomesticatorsSet import StandardDomesticatorsSet
 
 def nan_to_empty_string(val):
     """Return the value unless it is NaN, then it returns an empty string."""
@@ -94,8 +94,8 @@ class PartDomesticator:
     def domesticate(self, dna_sequence=None, protein_sequence=None,
                     is_cds=False, codon_optimization=None,
                     extra_constraints=(), extra_objectives=(),
-                    final_record_target=None, edit=False,
-                    report_target=None):
+                    final_record_target=None, edit=False, barcode='',
+                    barcode_spacer='AA', report_target=None):
         """Domesticate a sequence.
 
         Parameters
@@ -231,11 +231,18 @@ class GoldenGateDomesticator(PartDomesticator):
                  name='unnamed_domesticator', constraints=(), objectives=()):
         self.enzyme = enzyme
         self.left_overhang = left_overhang
+        left_overhang = sequence_to_biopython_record(left_overhang)
         self.right_overhang = right_overhang
-        self.enzyme_seq = Restriction.__dict__[enzyme].site
+        right_overhang = sequence_to_biopython_record(right_overhang)
+        for seq in [left_overhang, right_overhang]:
+            annotate_record(seq, label=str(seq.seq))
+        enzyme_seq = Restriction.__dict__[enzyme].site
+        enzyme_seq = sequence_to_biopython_record(enzyme_seq)
+        annotate_record(enzyme_seq, label=enzyme)
+        self.enzyme_seq = enzyme_seq
         left_flank = self.enzyme_seq + "A" + left_overhang + left_addition
         right_flank = (right_addition + right_overhang +
-                       reverse_complement(self.enzyme_seq + "A"))
+                       (self.enzyme_seq + "A").reverse_complement())
         constraints = list(constraints) + [
             lambda seq: AvoidPattern(
                 enzyme=enzyme,
@@ -263,14 +270,13 @@ class GoldenGateDomesticator(PartDomesticator):
         ]
 
     @staticmethod
-    def from_spreadsheet(path=None, dataframe=None, name_prefix=''):
+    def standard_from_spreadsheet(path=None, dataframe=None, name_prefix=''):
         if path is not None:
-            if path.lower().endswith("csv"):
+            if path.lower().endswith(".csv"):
                 dataframe = pandas.read_csv(path)
             else:
                 dataframe = pandas.read_excel(path)
-
-        return OrderedDict([
+        return StandardDomesticatorsSet(OrderedDict([
             (row.slot_name, GoldenGateDomesticator(
                 left_overhang=row.left_overhang,
                 right_overhang=row.right_overhang,
@@ -281,4 +287,4 @@ class GoldenGateDomesticator(PartDomesticator):
                 name=name_prefix + row.slot_name
             ))
             for i, row in dataframe.iterrows()
-        ])
+        ]))

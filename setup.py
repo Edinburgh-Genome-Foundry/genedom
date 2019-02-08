@@ -16,4 +16,4 @@ setup(name='genedom',
     include_package_data=True,
     install_requires=("dnachisel", "snapgene_reader", "pdf_reports",
                       "pandas", "dna_features_viewer", "python-box",
-                      "openpyxl", "sequenticon"))
+                      "openpyxl", "flametree", "sequenticon"))

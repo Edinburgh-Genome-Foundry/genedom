@@ -1,32 +1,111 @@
 from copy import deepcopy
+import itertools
 
 from Bio import SeqIO
 import pandas
-from proglog import MuteProgressBarLogger, TqdmProgressBarLogger
+import proglog
 
 import flametree
 from sequenticon import sequenticon
 
 from .PartDomesticator import PartDomesticator
 from .reports import domestication_report
-from .biotools import sanitize_and_uniquify
+from .biotools import sanitize_and_uniquify, sequence_to_record, annotate_record
 
-def batch_domestication(records, domesticator, target, allow_edits=False,
-                        domesticate_suffix="",
+def batch_domestication(records, target,
+                        domesticator=None,
+                        standard=None,
+                        allow_edits=False,
+                        domesticated_suffix="",
                         include_optimization_reports=True,
                         include_original_records=True,
-                        logger="bar"):
-    if logger == "bar":
-        logger = TqdmProgressBarLogger(min_time_interval=0.2)
-    elif logger is None:
-        logger = MuteProgressBarLogger()
+                        barcodes=(), barcode_order='same_as_records',
+                        barcode_spacer='AA', logger="bar"):
+    """Domesticate a batch of parts according to some domesticator/standard.
+    
+    Examples
+    --------
 
+    >>> from genedom import BUILTIN_STANDARDS, batch_domestication
+    >>> batch_domestication(some_records, standard=BUILTIN_STANDARDS.EMMA)
+
+    Parameters
+    ----------
+
+    records
+      List of Bioython records to be domesticated
+    
+    target
+      Path to a folder, to a zip file, or "@memory" for in-memory report
+      generatio (the raw binary data of a zip archive is then returned)
+
+    domesticator
+      Either a single domesticator, to be used for all parts in the batch, or
+      a function f(record) => appropriate_domesticator. Note that a "standard"
+      can be provided instead
+
+    standard
+      A StandardDomesticatorsSet object which will be used to attribute a
+      specific domesticator to each part. See BUILTIN_STANDARDS for
+      examples.
+
+    allow_edits
+      If False, sequences cannot be edited by the domesticator, only extended
+      with flanks. If a sequence has for instance forbidden restriction sites,
+      the domesticaton will fail for this sequence (and this will be noted in
+      the report. 
+
+    domesticated_suffix
+      Suffix to give to the domesticated parts names to differentiate them from
+      the original parts (this is optional).
+
+    include_optimization_reports
+      If yes, some genbanks and pdfs will be produced to show how each part
+      was domesticated. This is in particular informative when a domestication
+      fails and you want to understand why.
+
+    include_original_records
+      Will include the input records into the final report folder/archive,
+      for traceability.
+
+    barcodes
+      Either a list [(barcode_name, barcode),...] or a dictionary {name: bc} or
+      a BarcodesCollection instance. If any of this is provided, the final
+      parts will have a barcode added on the left (this barcode will be
+      "outside" the part and won't appear in final constructs, but can be used
+      to check that the part is the one you think if your samples get mixed up).
+      Note that if there are less barcodes than parts, the barcodes will cycle
+      and several parts may get the same barcode (which is generally fine).
+    
+    barcode_order
+      Either "same_as_records", or "by_size" if you want your barcodes to be
+      attributed from the smallest to the longest part in the batch.
+
+    barcode_spacer
+      Sequence to appear between the barcode and the left flank of the
+      domesticated part.
+    
+    logger
+      Either "bar" or None for no logger or any Proglog ProgressBarLogger.
+
+    """
+    logger = proglog.default_bar_logger(logger, min_time_interval=0.2)
     root = flametree.file_tree(target, replace=True)
     domesticated_dir = root._dir("domesticated")
     if include_original_records:
         original_dir = root._dir("original")
     if include_optimization_reports:
         errors_dir = root._dir("error_reports")
+    if standard is not None:
+        domesticator = standard.record_to_domesticator
+    
+    if hasattr(barcodes, 'items'):
+        barcodes = list(barcodes.items())
+    if len(barcodes):
+        barcodes = [b for b, r in zip(itertools.cycle(barcodes), records)]
+    if barcode_order == 'by_size':
+        lengths = [len(r) for r in records]
+        barcodes = [b for _, b in sorted(zip(lengths, barcodes))]
 
     infos = []
 
@@ -35,10 +114,11 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
     domesticated_records = []
     columns = ["Record", "Ordering Name", "Domesticator",
                "Domesticated Record", "Added bp", "Edited bp"]
-    for record in logger.iter_bar(record=records):
+
+    for i, record in logger.iter_bar(record=list(enumerate(records))):
         record = deepcopy(record)
         original_id = record.id
-        domesticated_id = record.id + domesticate_suffix
+        domesticated_id = record.id + domesticated_suffix
         domesticated_file_name = domesticated_id + ".gb"
         if isinstance(domesticator, PartDomesticator):
             record_domesticator = domesticator
@@ -49,10 +129,24 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
             report_target = errors_dir._dir(record.id)
         else:
             report_target = None
+        if len(barcodes):
+            barcode = barcodes[i]
+            if not isinstance(barcode, str):
+                barcode_id, barcode = barcode
+                barcode_id = " " + barcode_id
+            else:
+                barcode_id = ""
+            barcode = sequence_to_record(barcode)
+            annotate_record(barcode, label="BARCODE" + barcode_id)
+        else:
+            barcode = None
+
         final, edits, report, success, msg = record_domesticator.domesticate(
             record, report_target=report_target, edit=allow_edits)
         if not success:
             nfails += 1
+        if barcode is not None:
+            final = barcode + barcode_spacer + final
         final.original_id = original_id
         final.id = domesticated_id.replace(' ', '_')
         SeqIO.write(final, domesticated_dir._file(domesticated_file_name),
@@ -77,6 +171,8 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
             "Added bp": added_bp,
             "Edited bp": n_edits
         })
+        if barcode is not None:
+            infos[-1]['Barcode'] = barcode_id
     sanitizing_table = sanitize_and_uniquify([info['id'] for info in infos])
     order_id_dataframe = pandas.DataFrame(list(sanitizing_table.items()),
                                           columns=["sequence", "order_id"])
@@ -84,8 +180,10 @@ def batch_domestication(records, domesticator, target, allow_edits=False,
                               index=False)
     for info in infos:
         info['Order ID'] = sanitizing_table[info['id']]
-    columns = ["Record", "Order ID", "Domesticator",
-               "Domesticated Record", "Added bp", "Edited bp"]
+    columns = ["Record", "Order ID", "Domesticator", "Domesticated Record",
+               "Added bp", "Edited bp"]
+    if "Barcode" in infos[0]:
+        columns.append("Barcode")
     infos_dataframe = pandas.DataFrame(infos, columns=columns)
     infos_dataframe.sort_values('Order ID', inplace=True)
     domesticators = sorted(domesticators, key=lambda d: d.name)

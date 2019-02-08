@@ -1,4 +1,3 @@
-
 from datetime import datetime
 import os
 import hashlib
@@ -46,7 +45,10 @@ def domestication_report(target, domestication_infos, domesticators):
         tds = list(tr.find_all("td"))
         if len(tds) == 0:
             return
-        name, order_id, dom, final, added, edited = tds
+        if len(tds) == 6:
+            name, order_id, dom, final, added, edited = tds
+        else:
+            name, order_id, dom, final, added, edited, barcode = tds
         if "Failed" in final.text:
             add_css_class(tr, "negative")
         if edited.text != "0":

@@ -1,6 +1,7 @@
-import numpy as np
 import os
 import re
+from copy import deepcopy
+import numpy as np
 
 from snapgene_reader import snapgene_file_to_seqrecord
 
@@ -90,7 +91,6 @@ def load_records(path, capitalize=True):
 def complement(sequence):
     return "".join(complements_dict[c] for c in sequence)
 
-
 def reverse_complement(sequence):
     return complement(sequence)[::-1]
 
@@ -136,9 +136,6 @@ def annotate_record(seqrecord, location="full", feature_type="feature",
     )
 
 
-import re
-
-
 def sanitize_string(string, max_length=15,
                     replacements=(("'", "p"), ("*", "s"), ("-", "_"))):
     for old, new in replacements:
@@ -161,3 +158,13 @@ def sanitize_and_uniquify(strings, max_length=15,
         dejavu.add(newstring)
         table[string] = newstring
     return table
+
+def write_record(record, target, fmt='genbank'):
+    """Write a record as genbank, fasta, etc. via Biopython, with fixes"""
+    record = deepcopy(record)
+    record.name = record.name[:20]
+    if str(record.seq.alphabet.__class__.__name__) != 'DNAAlphabet':
+        record.seq.alphabet = DNAAlphabet()
+    if hasattr(target, 'open'):
+        target = target.open('w')
+    SeqIO.write(record, target, fmt)
