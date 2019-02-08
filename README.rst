@@ -39,8 +39,9 @@ Features include:
   sequence (but won't be in final constructs) in order to easily check
   that this is the right part in the future in case of label mix-up. 
 - Routine for mass-domesticating sequences with report generation, including
-  reports on sequence optimization, spreadsheets of parts, ready-to-order FASTA
-  records of the parts, and a summary report to quickly verify everything.
+  reports on each sequence optimization, spreadsheets of parts, ready-to-order FASTA
+  records of the parts, and a summary report to quickly verify everything, with a
+  list of every domesticator used, for traceability.
 
 Here is an example of summary report:
 
