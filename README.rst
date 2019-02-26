@@ -53,7 +53,7 @@ Here is an example of summary report:
     </p>
 
 
-You can also use Genedom online via ``this web app <https://cuba.genomefoundry.org/domesticate_part_batches>``_.
+You can also use Genedom online via `this web app <https://cuba.genomefoundry.org/domesticate_part_batches>`_.
 
 Usage examples
 ---------------
