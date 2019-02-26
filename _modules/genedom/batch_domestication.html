@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>genedom.batch_domestication &mdash; saboteurs 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/main.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="saboteurs 0.1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> saboteurs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Usage examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ref.html">Genedom - Reference manual</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">saboteurs</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>genedom.batch_domestication</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for genedom.batch_domestication</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">Bio</span> <span class="k">import</span> <span class="n">SeqIO</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">proglog</span>
+
+<span class="kn">import</span> <span class="nn">flametree</span>
+<span class="kn">from</span> <span class="nn">sequenticon</span> <span class="k">import</span> <span class="n">sequenticon</span>
+
+<span class="kn">from</span> <span class="nn">.PartDomesticator</span> <span class="k">import</span> <span class="n">PartDomesticator</span>
+<span class="kn">from</span> <span class="nn">.reports</span> <span class="k">import</span> <span class="n">write_pdf_domestication_report</span>
+<span class="kn">from</span> <span class="nn">.biotools</span> <span class="k">import</span> <span class="p">(</span><span class="n">sanitize_and_uniquify</span><span class="p">,</span> <span class="n">sequence_to_record</span><span class="p">,</span>
+                       <span class="n">annotate_record</span><span class="p">,</span> <span class="n">write_record</span><span class="p">)</span>
+
+<div class="viewcode-block" id="batch_domestication"><a class="viewcode-back" href="../../ref.html#genedom.batch_domestication">[docs]</a><span class="k">def</span> <span class="nf">batch_domestication</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span>
+                        <span class="n">domesticator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">standard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">allow_edits</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">domesticated_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">include_optimization_reports</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">include_original_records</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">barcodes</span><span class="o">=</span><span class="p">(),</span> <span class="n">barcode_order</span><span class="o">=</span><span class="s1">&#39;same_as_records&#39;</span><span class="p">,</span>
+                        <span class="n">barcode_spacer</span><span class="o">=</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Domesticate a batch of parts according to some domesticator/standard.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; from genedom import BUILTIN_STANDARDS, batch_domestication</span>
+<span class="sd">    &gt;&gt;&gt; batch_domestication(some_records, standard=BUILTIN_STANDARDS.EMMA)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    records</span>
+<span class="sd">      List of Bioython records to be domesticated</span>
+<span class="sd">    </span>
+<span class="sd">    target</span>
+<span class="sd">      Path to a folder, to a zip file, or &quot;@memory&quot; for in-memory report</span>
+<span class="sd">      generatio (the raw binary data of a zip archive is then returned)</span>
+
+<span class="sd">    domesticator</span>
+<span class="sd">      Either a single domesticator, to be used for all parts in the batch, or</span>
+<span class="sd">      a function f(record) =&gt; appropriate_domesticator. Note that a &quot;standard&quot;</span>
+<span class="sd">      can be provided instead</span>
+
+<span class="sd">    standard</span>
+<span class="sd">      A StandardDomesticatorsSet object which will be used to attribute a</span>
+<span class="sd">      specific domesticator to each part. See BUILTIN_STANDARDS for</span>
+<span class="sd">      examples.</span>
+
+<span class="sd">    allow_edits</span>
+<span class="sd">      If False, sequences cannot be edited by the domesticator, only extended</span>
+<span class="sd">      with flanks. If a sequence has for instance forbidden restriction sites,</span>
+<span class="sd">      the domesticaton will fail for this sequence (and this will be noted in</span>
+<span class="sd">      the report. </span>
+
+<span class="sd">    domesticated_suffix</span>
+<span class="sd">      Suffix to give to the domesticated parts names to differentiate them from</span>
+<span class="sd">      the original parts (this is optional).</span>
+
+<span class="sd">    include_optimization_reports</span>
+<span class="sd">      If yes, some genbanks and pdfs will be produced to show how each part</span>
+<span class="sd">      was domesticated. This is in particular informative when a domestication</span>
+<span class="sd">      fails and you want to understand why.</span>
+
+<span class="sd">    include_original_records</span>
+<span class="sd">      Will include the input records into the final report folder/archive,</span>
+<span class="sd">      for traceability.</span>
+
+<span class="sd">    barcodes</span>
+<span class="sd">      Either a list [(barcode_name, barcode),...] or a dictionary {name: bc} or</span>
+<span class="sd">      a BarcodesCollection instance. If any of this is provided, the final</span>
+<span class="sd">      parts will have a barcode added on the left (this barcode will be</span>
+<span class="sd">      &quot;outside&quot; the part and won&#39;t appear in final constructs, but can be used</span>
+<span class="sd">      to check that the part is the one you think if your samples get mixed up).</span>
+<span class="sd">      Note that if there are less barcodes than parts, the barcodes will cycle</span>
+<span class="sd">      and several parts may get the same barcode (which is generally fine).</span>
+<span class="sd">    </span>
+<span class="sd">    barcode_order</span>
+<span class="sd">      Either &quot;same_as_records&quot;, or &quot;by_size&quot; if you want your barcodes to be</span>
+<span class="sd">      attributed from the smallest to the longest part in the batch.</span>
+
+<span class="sd">    barcode_spacer</span>
+<span class="sd">      Sequence to appear between the barcode and the left flank of the</span>
+<span class="sd">      domesticated part.</span>
+<span class="sd">    </span>
+<span class="sd">    logger</span>
+<span class="sd">      Either &quot;bar&quot; or None for no logger or any Proglog ProgressBarLogger.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">proglog</span><span class="o">.</span><span class="n">default_bar_logger</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">min_time_interval</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">flametree</span><span class="o">.</span><span class="n">file_tree</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">domesticated_dir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">_dir</span><span class="p">(</span><span class="s2">&quot;domesticated&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">include_original_records</span><span class="p">:</span>
+        <span class="n">original_dir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">_dir</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">include_optimization_reports</span><span class="p">:</span>
+        <span class="n">errors_dir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">_dir</span><span class="p">(</span><span class="s2">&quot;error_reports&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">standard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">domesticator</span> <span class="o">=</span> <span class="n">standard</span><span class="o">.</span><span class="n">record_to_domesticator</span>
+    
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">barcodes</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">):</span>
+        <span class="n">barcodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">barcodes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">barcodes</span><span class="p">):</span>
+        <span class="n">barcodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="n">barcodes</span><span class="p">),</span> <span class="n">records</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">barcode_order</span> <span class="o">==</span> <span class="s1">&#39;by_size&#39;</span><span class="p">:</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">]</span>
+        <span class="n">barcodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">barcodes</span><span class="p">))]</span>
+
+    <span class="n">infos</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">domesticators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">nfails</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">domesticated_records</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Record&quot;</span><span class="p">,</span> <span class="s2">&quot;Ordering Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Domesticator&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;Domesticated Record&quot;</span><span class="p">,</span> <span class="s2">&quot;Added bp&quot;</span><span class="p">,</span> <span class="s2">&quot;Edited bp&quot;</span><span class="p">]</span>
+
+    <span class="c1"># DOMESTICATE ALL PARTS, APPEND BARCODE, GATHER DATA</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">iter_bar</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">records</span><span class="p">))):</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">original_id</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">domesticated_id</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="n">domesticated_suffix</span>
+        <span class="n">domesticated_file_name</span> <span class="o">=</span> <span class="n">domesticated_id</span> <span class="o">+</span> <span class="s2">&quot;.gb&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domesticator</span><span class="p">,</span> <span class="n">PartDomesticator</span><span class="p">):</span>
+            <span class="n">record_domesticator</span> <span class="o">=</span> <span class="n">domesticator</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">record_domesticator</span> <span class="o">=</span> <span class="n">domesticator</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">domesticators</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record_domesticator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_optimization_reports</span><span class="p">:</span>
+            <span class="n">report_target</span> <span class="o">=</span> <span class="n">errors_dir</span><span class="o">.</span><span class="n">_dir</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">report_target</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">barcodes</span><span class="p">):</span>
+            <span class="n">barcode</span> <span class="o">=</span> <span class="n">barcodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">barcode</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">barcode_id</span><span class="p">,</span> <span class="n">barcode</span> <span class="o">=</span> <span class="n">barcode</span>
+                <span class="n">barcode_id</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">barcode_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">barcode_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">barcode</span> <span class="o">=</span> <span class="n">sequence_to_record</span><span class="p">(</span><span class="n">barcode</span><span class="p">)</span>
+            <span class="n">annotate_record</span><span class="p">(</span><span class="n">barcode</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;BARCODE&quot;</span> <span class="o">+</span> <span class="n">barcode_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">barcode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># final, edits, report, success, msg</span>
+        <span class="n">domestication_results</span> <span class="o">=</span> <span class="n">record_domesticator</span><span class="o">.</span><span class="n">domesticate</span><span class="p">(</span>
+            <span class="n">record</span><span class="p">,</span> <span class="n">report_target</span><span class="o">=</span><span class="n">report_target</span><span class="p">,</span> <span class="n">edit</span><span class="o">=</span><span class="n">allow_edits</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">domestication_results</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+            <span class="n">nfails</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">barcode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">barcode</span> <span class="o">+</span> <span class="n">barcode_spacer</span> <span class="o">+</span> <span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="p">)</span>
+        <span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="o">.</span><span class="n">original_id</span> <span class="o">=</span> <span class="n">original_id</span>
+        <span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">domesticated_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">SeqIO</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="p">,</span>
+                    <span class="n">domesticated_dir</span><span class="o">.</span><span class="n">_file</span><span class="p">(</span><span class="n">domesticated_file_name</span><span class="p">),</span>
+                    <span class="s2">&quot;genbank&quot;</span><span class="p">)</span>
+        <span class="n">domesticated_records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_original_records</span><span class="p">:</span>
+            <span class="n">write_record</span><span class="p">(</span><span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="p">,</span>
+                         <span class="n">original_dir</span><span class="o">.</span><span class="n">_file</span><span class="p">(</span><span class="n">original_id</span> <span class="o">+</span> <span class="s2">&quot;.gb&quot;</span><span class="p">))</span>
+        <span class="n">n_edits</span> <span class="o">=</span> <span class="n">domestication_results</span><span class="o">.</span><span class="n">number_of_edits</span><span class="p">()</span>
+        <span class="n">added_bp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">before_seqicon</span> <span class="o">=</span> <span class="n">sequenticon</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;html_image&quot;</span><span class="p">)</span>
+        <span class="n">after_seqicon</span> <span class="o">=</span> <span class="n">sequenticon</span><span class="p">(</span><span class="n">domestication_results</span><span class="o">.</span><span class="n">record_after</span><span class="p">,</span>
+                                    <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;html_image&quot;</span><span class="p">)</span>
+
+        <span class="n">infos</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">original_id</span><span class="p">,</span>
+            <span class="s2">&quot;Record&quot;</span><span class="p">:</span> <span class="n">before_seqicon</span> <span class="o">+</span> <span class="n">original_id</span><span class="p">,</span>
+            <span class="s2">&quot;Domesticator&quot;</span><span class="p">:</span> <span class="n">record_domesticator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;Domesticated Record&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Failed: &quot;</span> <span class="o">+</span> <span class="n">domestication_results</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+                                   <span class="k">if</span> <span class="ow">not</span> <span class="n">domestication_results</span><span class="o">.</span><span class="n">success</span>
+                                   <span class="k">else</span> <span class="p">(</span><span class="n">after_seqicon</span> <span class="o">+</span> <span class="n">domesticated_id</span><span class="p">),</span>
+            <span class="s2">&quot;Added bp&quot;</span><span class="p">:</span> <span class="n">added_bp</span><span class="p">,</span>
+            <span class="s2">&quot;Edited bp&quot;</span><span class="p">:</span> <span class="n">n_edits</span>
+        <span class="p">})</span>
+        <span class="k">if</span> <span class="n">barcode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">infos</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Barcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">barcode_id</span>
+    
+    <span class="c1"># WRITE PDF REPORT</span>
+
+    <span class="n">sanitizing_table</span> <span class="o">=</span> <span class="n">sanitize_and_uniquify</span><span class="p">([</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">])</span>
+    <span class="n">order_id_dataframe</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sanitizing_table</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span>
+                                          <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">,</span> <span class="s2">&quot;order_id&quot;</span><span class="p">])</span>
+    <span class="n">order_id_dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">_file</span><span class="p">(</span><span class="s2">&quot;order_ids.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">),</span>
+                              <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">:</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Order ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sanitizing_table</span><span class="p">[</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Record&quot;</span><span class="p">,</span> <span class="s2">&quot;Order ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Domesticator&quot;</span><span class="p">,</span> <span class="s2">&quot;Domesticated Record&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;Added bp&quot;</span><span class="p">,</span> <span class="s2">&quot;Edited bp&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;Barcode&quot;</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Barcode&quot;</span><span class="p">)</span>
+    <span class="n">infos_dataframe</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">infos</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">infos_dataframe</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Order ID&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">domesticators</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">domesticators</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">write_pdf_domestication_report</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">_file</span><span class="p">(</span><span class="s2">&quot;Report.pdf&quot;</span><span class="p">),</span> <span class="n">infos_dataframe</span><span class="p">,</span>
+                             <span class="n">domesticators</span><span class="p">)</span>
+    
+    <span class="c1"># WRITE THE SEQUENCES TO ORDER AS FASTA</span>
+
+    <span class="n">order_dir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">_dir</span><span class="p">(</span><span class="s1">&#39;sequences_to_order&#39;</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">domesticated_records</span><span class="p">:</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">sanitizing_table</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">original_id</span><span class="p">]</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">SeqIO</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">domesticated_records</span><span class="p">,</span> <span class="n">order_dir</span><span class="o">.</span><span class="n">_file</span><span class="p">(</span><span class="s2">&quot;sequences_to_order.fa&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;fasta&quot;</span><span class="p">)</span>
+
+    <span class="c1"># WRITE THE SEQUENCES TO ORDER AS EXCEL</span>
+    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
+        <span class="nb">sorted</span><span class="p">([</span>
+            <span class="p">{</span><span class="s1">&#39;sequence&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+             <span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">),</span>
+             <span class="s1">&#39;sequence name&#39;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">domesticated_records</span>
+        <span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;sequence name&#39;</span><span class="p">]),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sequence name&#39;</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;sequence&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">order_dir</span><span class="o">.</span><span class="n">_file</span><span class="p">(</span><span class="s2">&quot;sequences_to_order.xls&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">),</span>
+                <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">order_dir</span><span class="o">.</span><span class="n">_file</span><span class="p">(</span><span class="s2">&quot;all_domesticated_parts.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">),</span>
+              <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nfails</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Zulko.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>genedom.BarcodesCollection &mdash; saboteurs 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/main.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="saboteurs 0.1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> saboteurs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Usage examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ref.html">Genedom - Reference manual</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">saboteurs</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>genedom.BarcodesCollection</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for genedom.BarcodesCollection</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">dnachisel</span> <span class="k">as</span> <span class="nn">dc</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">.biotools</span> <span class="k">import</span> <span class="n">sequence_to_record</span><span class="p">,</span> <span class="n">annotate_record</span><span class="p">,</span> <span class="n">write_record</span>
+
+<div class="viewcode-block" id="BarcodesCollection"><a class="viewcode-back" href="../../ref.html#genedom.BarcodesCollection">[docs]</a><span class="k">class</span> <span class="nc">BarcodesCollection</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class representing a set of named barcode sequences.</span>
+
+<span class="sd">    These barcodes are meant to be annealed with same-sequence primers for PCR</span>
+<span class="sd">    or sequencing.</span>
+<span class="sd">    </span>
+<span class="sd">    The constructor taked a list [(name, barcode), ...] as an input.</span>
+
+<span class="sd">    Use ``BarcodesCollection.from_specs(n_barcodes=25)`` to generate an</span>
+<span class="sd">    instance with 25 compatible barcodes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barcodes</span><span class="p">):</span>
+        <span class="n">OrderedDict</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barcodes</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_specs</span><span class="p">(</span><span class="n">n_barcodes</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">barcode_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">spacer</span><span class="o">=</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span>
+                   <span class="n">forbidden_enzymes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;BsaI&#39;</span><span class="p">,</span> <span class="s1">&#39;BsmBI&#39;</span><span class="p">,</span> <span class="s1">&#39;BbsI&#39;</span><span class="p">),</span>
+                   <span class="n">barcode_tmin</span><span class="o">=</span><span class="mi">55</span><span class="p">,</span> <span class="n">barcode_tmax</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
+                   <span class="n">other_primer_sequences</span><span class="o">=</span><span class="p">(),</span> <span class="n">heterodim_tmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                   <span class="n">max_homology_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">include_spacers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">names_template</span><span class="o">=</span><span class="s2">&quot;B_</span><span class="si">%03d</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a BarcodesCollection object with compatible barcodes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        n_barcodes</span>
+<span class="sd">          Number of barcodes to design</span>
+<span class="sd">        </span>
+<span class="sd">        barcode_length</span>
+<span class="sd">          Length of each barcode</span>
+<span class="sd">        </span>
+<span class="sd">        spacer</span>
+<span class="sd">          Spacer to place between each barcode during the optimization,</span>
+<span class="sd">          ideally the same spacer that will be used when adding the barcode</span>
+<span class="sd">          to a part.</span>
+<span class="sd">        </span>
+<span class="sd">        include_spacers</span>
+<span class="sd">          Whether the spacers should be part of the final sequence of the</span>
+<span class="sd">          barcodes (they still won&#39;t be considered part of the annealing</span>
+<span class="sd">          primer and won&#39;t be used for melting temperature computations)</span>
+
+<span class="sd">        forbidden_enzymes</span>
+<span class="sd">          Name of enzymes whose sites should not be in the barcodes.</span>
+
+<span class="sd">        barcode_tmin, barcode_tmax</span>
+<span class="sd">          Interval of acceptable values for the melting temperature</span>
+<span class="sd">        </span>
+<span class="sd">        other_primer_sequences</span>
+<span class="sd">          External sequences with which the primers should not anneal.</span>
+<span class="sd">        </span>
+<span class="sd">        heterodim_tmax</span>
+<span class="sd">          Max acceptable melting temperature for the annealing of a barcode</span>
+<span class="sd">          and one of the other_primer_sequences.</span>
+<span class="sd">        </span>
+<span class="sd">        max_homology_length</span>
+<span class="sd">          Maximal homology between any two barcodes in the sequence.</span>
+<span class="sd">        </span>
+<span class="sd">        names_template</span>
+<span class="sd">          The template used to name barcode number &quot;i&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unit_length</span> <span class="o">=</span> <span class="n">barcode_length</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">spacer</span><span class="p">)</span>
+        <span class="n">seq_len</span> <span class="o">=</span> <span class="n">n_barcodes</span> <span class="o">*</span> <span class="n">unit_length</span>
+        <span class="n">units_coordinates</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">unit_length</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">unit_length</span><span class="p">)]</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">dc</span><span class="o">.</span><span class="n">AvoidPattern</span><span class="p">(</span><span class="n">enzyme</span><span class="o">=</span><span class="n">enzyme</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">enzyme</span> <span class="ow">in</span> <span class="n">forbidden_enzymes</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">units_coordinates</span><span class="p">:</span>
+            <span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">dc</span><span class="o">.</span><span class="n">AllowPrimer</span><span class="p">(</span>
+                    <span class="n">tmin</span><span class="o">=</span><span class="n">barcode_tmin</span><span class="p">,</span>
+                    <span class="n">tmax</span><span class="o">=</span><span class="n">barcode_tmax</span><span class="p">,</span>
+                    <span class="n">max_homology_length</span><span class="o">=</span><span class="n">max_homology_length</span><span class="p">,</span>
+                    <span class="n">avoid_heterodim_with</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">max_heterodim_tm</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                    <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">spacer</span><span class="p">))</span>
+                <span class="p">),</span>
+                <span class="n">dc</span><span class="o">.</span><span class="n">EnforceSequence</span><span class="p">(</span><span class="n">spacer</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">spacer</span><span class="p">),</span> <span class="n">end</span><span class="p">)),</span>
+                <span class="n">dc</span><span class="o">.</span><span class="n">EnforceGCContent</span><span class="p">(</span><span class="n">mini</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                                    <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">spacer</span><span class="p">)))</span>   
+            <span class="p">]</span>
+        <span class="n">problem</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">DnaOptimizationProblem</span><span class="p">(</span>
+            <span class="n">sequence</span><span class="o">=</span><span class="n">dc</span><span class="o">.</span><span class="n">random_dna_sequence</span><span class="p">(</span><span class="n">seq_len</span><span class="p">),</span>
+            <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span>
+        <span class="p">)</span>
+        <span class="n">problem</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">ignored_bars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">)</span>
+        <span class="n">problem</span><span class="o">.</span><span class="n">resolve_constraints</span><span class="p">()</span>
+
+        <span class="n">barcodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">problem</span><span class="o">.</span><span class="n">sequence</span><span class="p">[</span><span class="n">start</span><span class="p">:</span> <span class="n">end</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="n">units_coordinates</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_spacers</span><span class="p">:</span>
+            <span class="n">barcodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">spacer</span><span class="p">)]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">barcodes</span><span class="p">]</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[(</span><span class="n">names_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">barcodes</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="n">BarcodesCollection</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">barcodes</span><span class="p">))</span>
+        
+        
+    <span class="k">def</span> <span class="nf">to_sequences_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of sequences [&quot;ATTG...&quot;, &quot;TTCTGT...&quot;]&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">to_fasta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return (and optionally write) a fasta string of the barcodes.&quot;&quot;&quot;</span>
+        <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;&gt; </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">barcode</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">barcode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fasta</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fasta</span>
+    
+    <span class="k">def</span> <span class="nf">to_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return (optionally write) individual Genbanks of the barcodes.&quot;&quot;&quot;</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">barcode</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">sequence_to_record</span><span class="p">(</span><span class="n">barcode</span><span class="p">)</span>
+            <span class="n">record</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="n">annotate_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+                <span class="n">write_record</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.gb&quot;</span> <span class="o">%</span> <span class="n">r</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">records</span></div>
+
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Zulko.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

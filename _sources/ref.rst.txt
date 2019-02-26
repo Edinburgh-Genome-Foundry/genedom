@@ -1,0 +1,38 @@
+.. _reference:
+
+Genedom - Reference manual
+============================
+
+Domesticators
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: genedom.PartDomesticator
+
+.. autoclass:: genedom.GoldenGateDomesticator
+
+Standards
+~~~~~~~~~
+
+.. autoclass:: genedom.StandardDomesticatorsSet
+
+batch_domestication
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: genedom.batch_domestication
+
+BarcodesCollection
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: genedom.BarcodesCollection
+
+
+
+Tools
+~~~~~
+
+These tools are either used by 
+
+.. autofunction:: genedom.load_record
+.. autofunction:: genedom.load_records
+.. autofunction:: genedom.write_record
+.. autofunction:: genedom.random_dna_sequence

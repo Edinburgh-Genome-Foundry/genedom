@@ -1,0 +1,604 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>genedom.PartDomesticator &mdash; saboteurs 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/main.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="saboteurs 0.1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> saboteurs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Usage examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ref.html">Genedom - Reference manual</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">saboteurs</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>genedom.PartDomesticator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for genedom.PartDomesticator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines central class BlockFinder.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">Bio</span> <span class="k">import</span> <span class="n">SeqIO</span><span class="p">,</span> <span class="n">Restriction</span>
+
+<span class="kn">from</span> <span class="nn">dnachisel</span> <span class="k">import</span> <span class="p">(</span><span class="n">AvoidPattern</span><span class="p">,</span> <span class="n">reverse_complement</span><span class="p">,</span> <span class="n">reverse_translate</span><span class="p">,</span>
+                       <span class="n">DnaOptimizationProblem</span><span class="p">,</span> <span class="n">EnforceTranslation</span><span class="p">,</span>
+                       <span class="n">annotate_record</span><span class="p">,</span> <span class="n">CodonOptimize</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span>
+                       <span class="n">sequence_to_biopython_record</span><span class="p">,</span> <span class="n">random_dna_sequence</span><span class="p">,</span>
+                       <span class="n">AvoidChanges</span><span class="p">,</span> <span class="n">AvoidChanges</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">dnachisel.reports</span> <span class="k">import</span> <span class="p">(</span><span class="n">optimization_with_report</span><span class="p">,</span>
+                               <span class="n">SpecAnnotationsTranslator</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">dna_features_viewer</span> <span class="k">import</span> <span class="n">BiopythonTranslator</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cm</span>
+
+
+<span class="kn">from</span> <span class="nn">.biotools</span> <span class="k">import</span> <span class="n">reverse_complement</span><span class="p">,</span> <span class="n">sequence_to_record</span><span class="p">,</span> <span class="n">annotate_record</span>
+<span class="kn">from</span> <span class="nn">.StandardDomesticatorsSet</span> <span class="k">import</span> <span class="n">StandardDomesticatorsSet</span>
+<span class="kn">from</span> <span class="nn">.DomesticationResult</span> <span class="k">import</span> <span class="n">DomesticationResult</span>
+
+<span class="k">def</span> <span class="nf">nan_to_empty_string</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the value unless it is NaN, then it returns an empty string.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">val</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">))</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+
+<div class="viewcode-block" id="PartDomesticator"><a class="viewcode-back" href="../../ref.html#genedom.PartDomesticator">[docs]</a><span class="k">class</span> <span class="nc">PartDomesticator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Generic domesticator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    name</span>
+<span class="sd">      Domesticator name as it will appear in reports etc.</span>
+<span class="sd">    </span>
+<span class="sd">    description</span>
+<span class="sd">      Short domesticator description as it will appear in reports etc.</span>
+<span class="sd">    </span>
+<span class="sd">    left_flank</span>
+<span class="sd">      String. Left addition to the sequence (homology arms, enzymes sites etc.)</span>
+<span class="sd">      </span>
+
+<span class="sd">    right_flank</span>
+<span class="sd">      String. Right addition to the sequence (homology arms, enz. sites etc.)</span>
+
+<span class="sd">    constraints</span>
+<span class="sd">      Either Dnachisel constraints or functions (sequence =&gt; constraint) to be</span>
+<span class="sd">      applied to the sequence for optimization</span>
+
+
+<span class="sd">    objectives</span>
+<span class="sd">      Either Dnachisel objectives or functions (sequence =&gt; objective) to be</span>
+<span class="sd">      applied to the sequence for optimization.</span>
+
+<span class="sd">    simultaneous_mutations</span>
+<span class="sd">      Number of sequences mutations to be applied simulatenously during</span>
+<span class="sd">      optimization. A larger number creates more noise but could allow to</span>
+<span class="sd">      solve tougher problems.</span>
+
+<span class="sd">    minimize_edits</span>
+<span class="sd">      If true, the optimizer will attempt to minimize changes while making</span>
+<span class="sd">      sure the constraints hold (each edit incurs a penalty of 1 in the</span>
+<span class="sd">      total optimization score).</span>
+
+<span class="sd">    logger</span>
+<span class="sd">      A proglog logger or &#39;bar&#39; or None for no logger at all.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;unnamed domesticator&#39;</span><span class="p">,</span> <span class="n">left_flank</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">right_flank</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="p">(),</span> <span class="n">objectives</span><span class="o">=</span><span class="p">(),</span>
+                 <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">simultaneous_mutations</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">minimize_edits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_flank</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">left_flank</span> <span class="o">=</span> <span class="n">sequence_to_biopython_record</span><span class="p">(</span><span class="n">left_flank</span><span class="p">)</span>
+            <span class="n">annotate_record</span><span class="p">(</span><span class="n">left_flank</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;left flank&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_flank</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">right_flank</span> <span class="o">=</span> <span class="n">sequence_to_biopython_record</span><span class="p">(</span><span class="n">right_flank</span><span class="p">)</span>
+            <span class="n">annotate_record</span><span class="p">(</span><span class="n">right_flank</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;right flank&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_flank</span> <span class="o">=</span> <span class="n">left_flank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_flank</span> <span class="o">=</span> <span class="n">right_flank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">objectives</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simultaneous_mutations</span> <span class="o">=</span> <span class="n">simultaneous_mutations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_edits</span> <span class="o">=</span> <span class="n">minimize_edits</span>
+
+    <span class="k">def</span> <span class="nf">domesticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dna_sequence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">protein_sequence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">is_cds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">codon_optimization</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">extra_constraints</span><span class="o">=</span><span class="p">(),</span> <span class="n">extra_objectives</span><span class="o">=</span><span class="p">(),</span>
+                    <span class="n">final_record_target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">barcode</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">barcode_spacer</span><span class="o">=</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span> <span class="n">report_target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Domesticate a sequence.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        dna_sequence</span>
+<span class="sd">          The DNA sequence string to domesticate.</span>
+<span class="sd">        </span>
+<span class="sd">        protein_sequence</span>
+<span class="sd">          Amino-acid sequence of the protein, which will be converted into</span>
+<span class="sd">          a DNA sequence string.</span>
+<span class="sd">        </span>
+<span class="sd">        is_cds</span>
+<span class="sd">          If True, sequence edits are restricted to synonymous mutations.</span>
+
+<span class="sd">        codon_optimization</span>
+<span class="sd">          Either None for no codon optimization or the name of an organism</span>
+<span class="sd">          supported by DnaChisel.</span>
+<span class="sd">        </span>
+<span class="sd">        extra_constraints</span>
+<span class="sd">          List of extra constraints to apply to the domesticated sequences.</span>
+<span class="sd">          Each constraint is either a DnaChisel constraint or a function</span>
+<span class="sd">          (dna_sequence =&gt; DnaChisel constraint).</span>
+<span class="sd">        </span>
+<span class="sd">        extra_objectives</span>
+<span class="sd">          List of extra optimization objectives to apply to the domesticated</span>
+<span class="sd">          sequences. Each objective is either a DnaChisel constraint or a</span>
+<span class="sd">          function (dna_sequence =&gt; DnaChisel constraint).</span>
+<span class="sd">        </span>
+<span class="sd">        final_record_target</span>
+<span class="sd">          Path to the file where to write the final genbank</span>
+<span class="sd">        </span>
+<span class="sd">        edit</span>
+<span class="sd">          Turn to True to allow sequence edits (if it is false and no all</span>
+<span class="sd">          constraints are originally satisfied, a failed domestication result</span>
+<span class="sd">          (i.e. with attribute ``success`` set to False) will be returned.</span>
+<span class="sd">        </span>
+<span class="sd">        report_target</span>
+<span class="sd">          Target for the sequence optimization report (a folder path, or a zip</span>
+<span class="sd">          path)</span>
+<span class="sd">        </span>
+<span class="sd">        barcode</span>
+<span class="sd">          A sequence of DNA that will be added to the left of the sequence once</span>
+<span class="sd">          the domestication is done.</span>
+
+<span class="sd">        barcode_spacer</span>
+<span class="sd">          Nucleotides to be added between the barcode and the enzyme (optional,</span>
+<span class="sd">          the idea here is that they will make sure to avoid the creation of</span>
+<span class="sd">          unwanted cutting sites).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        final_record, edits_record, report_data, success, msg</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">protein_sequence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">is_cds</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">dna_sequence</span> <span class="o">=</span> <span class="n">reverse_translate</span><span class="p">(</span><span class="n">protein_sequence</span><span class="p">)</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">c</span><span class="p">(</span><span class="n">dna_sequence</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">c</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_constraints</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span>
+        <span class="p">]</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left_flank</span><span class="p">),</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left_flank</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">dna_sequence</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">is_cds</span><span class="p">:</span>
+            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EnforceTranslation</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">))</span>
+        <span class="n">objectives</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">o</span><span class="p">(</span><span class="n">dna_sequence</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">o</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_objectives</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">codon_optimization</span><span class="p">:</span>
+            <span class="n">objectives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CodonOptimize</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="n">codon_optimization</span><span class="p">,</span>
+                                            <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize_edits</span><span class="p">:</span>
+            <span class="n">objectives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AvoidChanges</span><span class="p">())</span>
+
+        <span class="n">extended_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_flank</span> <span class="o">+</span> <span class="n">dna_sequence</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_flank</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_cds</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">edit</span><span class="p">):</span>
+            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AvoidChanges</span><span class="p">())</span>
+        <span class="n">problem</span> <span class="o">=</span> <span class="n">DnaOptimizationProblem</span><span class="p">(</span>
+            <span class="n">extended_sequence</span><span class="p">,</span>
+            <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+            <span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span>
+        <span class="n">problem</span><span class="o">.</span><span class="n">n_mutations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simultaneous_mutations</span>
+        <span class="n">optimization_successful</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">report_target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">report_data</span><span class="p">)</span> <span class="o">=</span> <span class="n">optimization_with_report</span><span class="p">(</span>
+                <span class="n">target</span><span class="o">=</span><span class="n">report_target</span><span class="p">,</span>
+                <span class="n">problem</span><span class="o">=</span><span class="n">problem</span><span class="p">,</span>
+                <span class="n">project_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+            <span class="n">optimization_successful</span> <span class="o">=</span> <span class="n">success</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">report_data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">problem</span><span class="o">.</span><span class="n">resolve_constraints</span><span class="p">()</span>
+                <span class="n">problem</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="n">optimization_successful</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">report_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">final_record</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">to_record</span><span class="p">(</span>
+            <span class="n">with_original_features</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">with_original_spec_features</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">with_constraints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">with_objectives</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="n">edits_record</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">to_record</span><span class="p">(</span>
+            <span class="n">with_original_features</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">with_original_spec_features</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">with_constraints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">with_objectives</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">with_sequence_edits</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">final_record_target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">SeqIO</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">final_record</span><span class="p">,</span> <span class="n">final_record_target</span><span class="p">,</span> <span class="s1">&#39;genbank&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DomesticationResult</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">sequence_before</span><span class="p">,</span> <span class="n">final_record</span><span class="p">,</span>
+                                   <span class="n">edits_record</span><span class="p">,</span> <span class="n">report_data</span><span class="p">,</span>
+                                   <span class="n">optimization_successful</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">details_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List of details for representing the domesticator in reports.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Description&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Left addition&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left_flank</span><span class="o">.</span><span class="n">seq</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s2">&quot;Right addition&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right_flank</span><span class="o">.</span><span class="n">seq</span><span class="p">)),</span>
+        <span class="p">]</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">html_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;HTML representation of the ``details_list``, for reports.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;br /&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s2">&quot;&lt;b&gt;</span><span class="si">%s</span><span class="s2">&lt;/b&gt;: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">details_list</span><span class="p">()</span>
+        <span class="p">])</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">plot_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot the given record with a custom DnaFeaturesViewer plotter.&quot;&quot;&quot;</span>
+        <span class="n">translator</span> <span class="o">=</span> <span class="n">SpecAnnotationsTranslator</span><span class="p">()</span>
+        <span class="n">gr_record</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate_record</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">gr_record</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GoldenGateDomesticator"><a class="viewcode-back" href="../../ref.html#genedom.GoldenGateDomesticator">[docs]</a><span class="k">class</span> <span class="nc">GoldenGateDomesticator</span><span class="p">(</span><span class="n">PartDomesticator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Special domesticator class for Golden-Gate standards</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    left_overhang</span>
+<span class="sd">      4bp overhang to be added on the left</span>
+<span class="sd">    </span>
+<span class="sd">    right_overhang</span>
+<span class="sd">      4bp overhang to be added on the right</span>
+<span class="sd">    </span>
+<span class="sd">    left_addition</span>
+<span class="sd">      Extra sequence of DNA to be systematically added on the left of each part</span>
+<span class="sd">      between the enzyme site and the rest of the sequence.</span>
+<span class="sd">    </span>
+<span class="sd">    right_addition</span>
+<span class="sd">      Extra sequence to be systematically added on the right of each part</span>
+<span class="sd">      between the enzyme site and the rest of the sequence.</span>
+<span class="sd">    </span>
+<span class="sd">    enzyme</span>
+<span class="sd">      Enzyme used for the Golden Gate assembly. This enzyme will be added on</span>
+<span class="sd">      the flanks of the sequence, and the internal sequence will be protected</span>
+<span class="sd">      against sites from this enzyme during optimization.</span>
+<span class="sd">    </span>
+<span class="sd">    extra_avoided_sites</span>
+<span class="sd">      Other enzymes from which the sequence should be protected during</span>
+<span class="sd">      optimization in addition to the assembly ``enzyme``.</span>
+<span class="sd">    </span>
+<span class="sd">    description</span>
+<span class="sd">      Description of the domesticator as it will appear in reports.</span>
+<span class="sd">    </span>
+<span class="sd">    name</span>
+<span class="sd">      Name of the domesticator as it will appear in reports</span>
+
+<span class="sd">    constraints</span>
+<span class="sd">      Either Dnachisel constraints or functions (sequence =&gt; constraint) to be</span>
+<span class="sd">      applied to the sequence for optimization</span>
+
+<span class="sd">    objectives</span>
+<span class="sd">      Either Dnachisel objectives or functions (sequence =&gt; objective) to be</span>
+<span class="sd">      applied to the sequence for optimization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_overhang</span><span class="p">,</span> <span class="n">right_overhang</span><span class="p">,</span> <span class="n">left_addition</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">right_addition</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">enzyme</span><span class="o">=</span><span class="s1">&#39;BsmBI&#39;</span><span class="p">,</span> <span class="n">extra_avoided_sites</span><span class="o">=</span><span class="p">(),</span>
+                 <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Golden Gate domesticator&#39;</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="s1">&#39;unnamed_domesticator&#39;</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="p">(),</span> <span class="n">objectives</span><span class="o">=</span><span class="p">()):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enzyme</span> <span class="o">=</span> <span class="n">enzyme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_overhang</span> <span class="o">=</span> <span class="n">left_overhang</span>
+        <span class="n">left_overhang</span> <span class="o">=</span> <span class="n">sequence_to_biopython_record</span><span class="p">(</span><span class="n">left_overhang</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_overhang</span> <span class="o">=</span> <span class="n">right_overhang</span>
+        <span class="n">right_overhang</span> <span class="o">=</span> <span class="n">sequence_to_biopython_record</span><span class="p">(</span><span class="n">right_overhang</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="p">[</span><span class="n">left_overhang</span><span class="p">,</span> <span class="n">right_overhang</span><span class="p">]:</span>
+            <span class="n">annotate_record</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">seq</span><span class="p">))</span>
+        <span class="n">enzyme_seq</span> <span class="o">=</span> <span class="n">Restriction</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">enzyme</span><span class="p">]</span><span class="o">.</span><span class="n">site</span>
+        <span class="n">enzyme_seq</span> <span class="o">=</span> <span class="n">sequence_to_biopython_record</span><span class="p">(</span><span class="n">enzyme_seq</span><span class="p">)</span>
+        <span class="n">annotate_record</span><span class="p">(</span><span class="n">enzyme_seq</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">enzyme</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enzyme_seq</span> <span class="o">=</span> <span class="n">enzyme_seq</span>
+        <span class="n">left_flank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enzyme_seq</span> <span class="o">+</span> <span class="s2">&quot;A&quot;</span> <span class="o">+</span> <span class="n">left_overhang</span> <span class="o">+</span> <span class="n">left_addition</span>
+        <span class="n">right_flank</span> <span class="o">=</span> <span class="p">(</span><span class="n">right_addition</span> <span class="o">+</span> <span class="n">right_overhang</span> <span class="o">+</span>
+                       <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enzyme_seq</span> <span class="o">+</span> <span class="s2">&quot;A&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">())</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="p">(</span><span class="k">lambda</span> <span class="n">seq</span><span class="p">:</span> <span class="n">AvoidPattern</span><span class="p">(</span>
+                <span class="n">enzyme</span><span class="o">=</span><span class="n">enzyme</span><span class="p">,</span>
+                <span class="n">location</span><span class="o">=</span><span class="n">Location</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">left_flank</span><span class="p">),</span>
+                                  <span class="nb">len</span><span class="p">(</span><span class="n">left_flank</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">))))</span>
+            <span class="k">for</span> <span class="n">enz</span> <span class="ow">in</span> <span class="p">([</span><span class="n">enzyme</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_avoided_sites</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="n">PartDomesticator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_flank</span><span class="o">=</span><span class="n">left_flank</span><span class="p">,</span>
+                                  <span class="n">right_flank</span><span class="o">=</span><span class="n">right_flank</span><span class="p">,</span>
+                                  <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+                                  <span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
+                                  <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                                  <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;GgDomesticator[</span><span class="si">%s</span><span class="s2">](</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enzyme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_overhang</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">right_overhang</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;GgDomesticator[</span><span class="si">%s</span><span class="s2">](</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enzyme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_overhang</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">right_overhang</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">details_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PartDomesticator</span><span class="o">.</span><span class="n">details_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;Enzyme&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enzyme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enzyme_seq</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s2">&quot;Left overhang&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_overhang</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Right overhang&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_overhang</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">standard_from_spreadsheet</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a spreadsheet into a standard with Golden Gate domesticators.</span>
+
+<span class="sd">        The input should be a table with columns names as follows:</span>
+<span class="sd">        slot_name, left_overhang, right_overhang, left_addition,</span>
+<span class="sd">        right_addition, enzyme, extra_avoided_sites, description.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        path</span>
+<span class="sd">          Path to a CSV or XLS(X) file. A dataframe can be provided instead.</span>
+<span class="sd">        </span>
+<span class="sd">        dataframe</span>
+<span class="sd">          A pandas Dataframe which can be provided instead of a path</span>
+<span class="sd">          </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
+                <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">StandardDomesticatorsSet</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">([</span>
+            <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">slot_name</span><span class="p">,</span> <span class="n">GoldenGateDomesticator</span><span class="p">(</span>
+                <span class="n">left_overhang</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">left_overhang</span><span class="p">,</span>
+                <span class="n">right_overhang</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">right_overhang</span><span class="p">,</span>
+                <span class="n">left_addition</span><span class="o">=</span><span class="n">nan_to_empty_string</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">left_addition</span><span class="p">),</span>
+                <span class="n">right_addition</span><span class="o">=</span><span class="n">nan_to_empty_string</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">right_addition</span><span class="p">),</span>
+                <span class="n">enzyme</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">enzyme</span><span class="p">,</span>
+                <span class="n">extra_avoided_sites</span> <span class="o">=</span> <span class="p">[</span>
+                  <span class="n">e</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">extra_avoided_sites</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                <span class="p">]</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">extra_avoided_sites</span><span class="p">,</span> <span class="s1">&#39;split&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[],</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name_prefix</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">slot_name</span>
+            <span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+        <span class="p">]))</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Zulko.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

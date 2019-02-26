@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Genedom - Reference manual &mdash; saboteurs 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/css/main.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="saboteurs 0.1.0 documentation" href="index.html"/>
+        <link rel="prev" title="Usage examples" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> saboteurs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Usage examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Genedom - Reference manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#domesticators">Domesticators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standards">Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batch-domestication">batch_domestication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#barcodescollection">BarcodesCollection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tools">Tools</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">saboteurs</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Genedom - Reference manual</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ref.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="genedom-reference-manual">
+<span id="reference"></span><h1>Genedom - Reference manual<a class="headerlink" href="#genedom-reference-manual" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="domesticators">
+<h2>Domesticators<a class="headerlink" href="#domesticators" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="genedom.PartDomesticator">
+<em class="property">class </em><code class="descclassname">genedom.</code><code class="descname">PartDomesticator</code><span class="sig-paren">(</span><em>name='unnamed domesticator'</em>, <em>left_flank=''</em>, <em>right_flank=''</em>, <em>constraints=()</em>, <em>objectives=()</em>, <em>description=None</em>, <em>simultaneous_mutations=1</em>, <em>minimize_edits=True</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/PartDomesticator.html#PartDomesticator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.PartDomesticator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic domesticator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong></p>
+<blockquote>
+<div><p>Domesticator name as it will appear in reports etc.</p>
+</div></blockquote>
+<p><strong>description</strong></p>
+<blockquote>
+<div><p>Short domesticator description as it will appear in reports etc.</p>
+</div></blockquote>
+<p><strong>left_flank</strong></p>
+<blockquote>
+<div><p>String. Left addition to the sequence (homology arms, enzymes sites etc.)</p>
+</div></blockquote>
+<p><strong>right_flank</strong></p>
+<blockquote>
+<div><p>String. Right addition to the sequence (homology arms, enz. sites etc.)</p>
+</div></blockquote>
+<p><strong>constraints</strong></p>
+<blockquote>
+<div><p>Either Dnachisel constraints or functions (sequence =&gt; constraint) to be
+applied to the sequence for optimization</p>
+</div></blockquote>
+<p><strong>objectives</strong></p>
+<blockquote>
+<div><p>Either Dnachisel objectives or functions (sequence =&gt; objective) to be
+applied to the sequence for optimization.</p>
+</div></blockquote>
+<p><strong>simultaneous_mutations</strong></p>
+<blockquote>
+<div><p>Number of sequences mutations to be applied simulatenously during
+optimization. A larger number creates more noise but could allow to
+solve tougher problems.</p>
+</div></blockquote>
+<p><strong>minimize_edits</strong></p>
+<blockquote>
+<div><p>If true, the optimizer will attempt to minimize changes while making
+sure the constraints hold (each edit incurs a penalty of 1 in the
+total optimization score).</p>
+</div></blockquote>
+<p><strong>logger</strong></p>
+<blockquote class="last">
+<div><p>A proglog logger or ‘bar’ or None for no logger at all.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="genedom.GoldenGateDomesticator">
+<em class="property">class </em><code class="descclassname">genedom.</code><code class="descname">GoldenGateDomesticator</code><span class="sig-paren">(</span><em>left_overhang</em>, <em>right_overhang</em>, <em>left_addition=''</em>, <em>right_addition=''</em>, <em>enzyme='BsmBI'</em>, <em>extra_avoided_sites=()</em>, <em>description='Golden Gate domesticator'</em>, <em>name='unnamed_domesticator'</em>, <em>constraints=()</em>, <em>objectives=()</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/PartDomesticator.html#GoldenGateDomesticator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.GoldenGateDomesticator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special domesticator class for Golden-Gate standards</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>left_overhang</strong></p>
+<blockquote>
+<div><p>4bp overhang to be added on the left</p>
+</div></blockquote>
+<p><strong>right_overhang</strong></p>
+<blockquote>
+<div><p>4bp overhang to be added on the right</p>
+</div></blockquote>
+<p><strong>left_addition</strong></p>
+<blockquote>
+<div><p>Extra sequence of DNA to be systematically added on the left of each part
+between the enzyme site and the rest of the sequence.</p>
+</div></blockquote>
+<p><strong>right_addition</strong></p>
+<blockquote>
+<div><p>Extra sequence to be systematically added on the right of each part
+between the enzyme site and the rest of the sequence.</p>
+</div></blockquote>
+<p><strong>enzyme</strong></p>
+<blockquote>
+<div><p>Enzyme used for the Golden Gate assembly. This enzyme will be added on
+the flanks of the sequence, and the internal sequence will be protected
+against sites from this enzyme during optimization.</p>
+</div></blockquote>
+<p><strong>extra_avoided_sites</strong></p>
+<blockquote>
+<div><p>Other enzymes from which the sequence should be protected during
+optimization in addition to the assembly <code class="docutils literal"><span class="pre">enzyme</span></code>.</p>
+</div></blockquote>
+<p><strong>description</strong></p>
+<blockquote>
+<div><p>Description of the domesticator as it will appear in reports.</p>
+</div></blockquote>
+<p><strong>name</strong></p>
+<blockquote>
+<div><p>Name of the domesticator as it will appear in reports</p>
+</div></blockquote>
+<p><strong>constraints</strong></p>
+<blockquote>
+<div><p>Either Dnachisel constraints or functions (sequence =&gt; constraint) to be
+applied to the sequence for optimization</p>
+</div></blockquote>
+<p><strong>objectives</strong></p>
+<blockquote class="last">
+<div><p>Either Dnachisel objectives or functions (sequence =&gt; objective) to be
+applied to the sequence for optimization.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+</div>
+<div class="section" id="standards">
+<h2>Standards<a class="headerlink" href="#standards" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="genedom.StandardDomesticatorsSet">
+<em class="property">class </em><code class="descclassname">genedom.</code><code class="descname">StandardDomesticatorsSet</code><span class="sig-paren">(</span><em>domesticators</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/StandardDomesticatorsSet.html#StandardDomesticatorsSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.StandardDomesticatorsSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to gather several domesticators defining an assembly standard.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>domesticators</strong></p>
+<blockquote class="last">
+<div><p>A dictionnary {name: domesticator} of PartDomesticators.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+</div>
+<div class="section" id="batch-domestication">
+<h2>batch_domestication<a class="headerlink" href="#batch-domestication" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="genedom.batch_domestication">
+<code class="descclassname">genedom.</code><code class="descname">batch_domestication</code><span class="sig-paren">(</span><em>records</em>, <em>target</em>, <em>domesticator=None</em>, <em>standard=None</em>, <em>allow_edits=False</em>, <em>domesticated_suffix=''</em>, <em>include_optimization_reports=True</em>, <em>include_original_records=True</em>, <em>barcodes=()</em>, <em>barcode_order='same_as_records'</em>, <em>barcode_spacer='AA'</em>, <em>logger='bar'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/batch_domestication.html#batch_domestication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.batch_domestication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Domesticate a batch of parts according to some domesticator/standard.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>records</strong></p>
+<blockquote>
+<div><p>List of Bioython records to be domesticated</p>
+</div></blockquote>
+<p><strong>target</strong></p>
+<blockquote>
+<div><p>Path to a folder, to a zip file, or “&#64;memory” for in-memory report
+generatio (the raw binary data of a zip archive is then returned)</p>
+</div></blockquote>
+<p><strong>domesticator</strong></p>
+<blockquote>
+<div><p>Either a single domesticator, to be used for all parts in the batch, or
+a function f(record) =&gt; appropriate_domesticator. Note that a “standard”
+can be provided instead</p>
+</div></blockquote>
+<p><strong>standard</strong></p>
+<blockquote>
+<div><p>A StandardDomesticatorsSet object which will be used to attribute a
+specific domesticator to each part. See BUILTIN_STANDARDS for
+examples.</p>
+</div></blockquote>
+<p><strong>allow_edits</strong></p>
+<blockquote>
+<div><p>If False, sequences cannot be edited by the domesticator, only extended
+with flanks. If a sequence has for instance forbidden restriction sites,
+the domesticaton will fail for this sequence (and this will be noted in
+the report.</p>
+</div></blockquote>
+<p><strong>domesticated_suffix</strong></p>
+<blockquote>
+<div><p>Suffix to give to the domesticated parts names to differentiate them from
+the original parts (this is optional).</p>
+</div></blockquote>
+<p><strong>include_optimization_reports</strong></p>
+<blockquote>
+<div><p>If yes, some genbanks and pdfs will be produced to show how each part
+was domesticated. This is in particular informative when a domestication
+fails and you want to understand why.</p>
+</div></blockquote>
+<p><strong>include_original_records</strong></p>
+<blockquote>
+<div><p>Will include the input records into the final report folder/archive,
+for traceability.</p>
+</div></blockquote>
+<p><strong>barcodes</strong></p>
+<blockquote>
+<div><p>Either a list [(barcode_name, barcode),…] or a dictionary {name: bc} or
+a BarcodesCollection instance. If any of this is provided, the final
+parts will have a barcode added on the left (this barcode will be
+“outside” the part and won’t appear in final constructs, but can be used
+to check that the part is the one you think if your samples get mixed up).
+Note that if there are less barcodes than parts, the barcodes will cycle
+and several parts may get the same barcode (which is generally fine).</p>
+</div></blockquote>
+<p><strong>barcode_order</strong></p>
+<blockquote>
+<div><p>Either “same_as_records”, or “by_size” if you want your barcodes to be
+attributed from the smallest to the longest part in the batch.</p>
+</div></blockquote>
+<p><strong>barcode_spacer</strong></p>
+<blockquote>
+<div><p>Sequence to appear between the barcode and the left flank of the
+domesticated part.</p>
+</div></blockquote>
+<p><strong>logger</strong></p>
+<blockquote class="last">
+<div><p>Either “bar” or None for no logger or any Proglog ProgressBarLogger.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">genedom</span> <span class="k">import</span> <span class="n">BUILTIN_STANDARDS</span><span class="p">,</span> <span class="n">batch_domestication</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">batch_domestication</span><span class="p">(</span><span class="n">some_records</span><span class="p">,</span> <span class="n">standard</span><span class="o">=</span><span class="n">BUILTIN_STANDARDS</span><span class="o">.</span><span class="n">EMMA</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="barcodescollection">
+<h2>BarcodesCollection<a class="headerlink" href="#barcodescollection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="genedom.BarcodesCollection">
+<em class="property">class </em><code class="descclassname">genedom.</code><code class="descname">BarcodesCollection</code><span class="sig-paren">(</span><em>barcodes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/BarcodesCollection.html#BarcodesCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.BarcodesCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class representing a set of named barcode sequences.</p>
+<p>These barcodes are meant to be annealed with same-sequence primers for PCR
+or sequencing.</p>
+<p>The constructor taked a list [(name, barcode), …] as an input.</p>
+<p>Use <code class="docutils literal"><span class="pre">BarcodesCollection.from_specs(n_barcodes=25)</span></code> to generate an
+instance with 25 compatible barcodes.</p>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tools">
+<h2>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h2>
+<p>These tools are either used by</p>
+<dl class="function">
+<dt id="genedom.load_record">
+<code class="descclassname">genedom.</code><code class="descname">load_record</code><span class="sig-paren">(</span><em>filename</em>, <em>linear=True</em>, <em>name='unnamed'</em>, <em>capitalize=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/biotools.html#load_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.load_record" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="genedom.load_records">
+<code class="descclassname">genedom.</code><code class="descname">load_records</code><span class="sig-paren">(</span><em>path</em>, <em>capitalize=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/biotools.html#load_records"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.load_records" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="genedom.write_record">
+<code class="descclassname">genedom.</code><code class="descname">write_record</code><span class="sig-paren">(</span><em>record</em>, <em>target</em>, <em>fmt='genbank'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/biotools.html#write_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.write_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a record as genbank, fasta, etc. via Biopython, with fixes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="genedom.random_dna_sequence">
+<code class="descclassname">genedom.</code><code class="descname">random_dna_sequence</code><span class="sig-paren">(</span><em>length</em>, <em>probas=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genedom/biotools.html#random_dna_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genedom.random_dna_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random DNA sequence (“ATGGCGT…”) with the specified length.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>length</strong></p>
+<blockquote>
+<div><p>Length of the DNA sequence.</p>
+</div></blockquote>
+<p><strong>proba</strong></p>
+<blockquote>
+<div><p>Frequencies for the different nucleotides, for instance
+<code class="docutils literal"><span class="pre">probas={&quot;A&quot;:0.2,</span> <span class="pre">&quot;T&quot;:0.3,</span> <span class="pre">&quot;G&quot;:0.3,</span> <span class="pre">&quot;C&quot;:0.2}</span></code>.
+If not specified, all nucleotides are equiprobable (p=0.25).</p>
+</div></blockquote>
+<p><strong>seed</strong></p>
+<blockquote class="last">
+<div><p>The seed to feed to the random number generator. When a seed is provided
+the random results depend deterministically on the seed, thus enabling
+reproducibility</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Usage examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Zulko.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
