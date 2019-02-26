@@ -1,7 +1,7 @@
 .. raw:: html
 
     <p align="center">
-    <img alt="logo" title="genedom Logo" src="https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/genedom/master/docs/logo.png" width="550">
+    <img alt="logo" title="genedom Logo" src="https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/genedom/master/docs/_statix_images/logo.png" width="550">
     <br /><br />
     </p>
 
