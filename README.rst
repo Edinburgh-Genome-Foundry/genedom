@@ -52,8 +52,11 @@ Here is an example of summary report:
     <br /><br />
     </p>
 
-Usage
------
+
+You can also use Genedom online via ``this web app <https://cuba.genomefoundry.org/domesticate_part_batches>``_.
+
+Usage examples
+---------------
 
 Simple domestication of one part
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,23 +104,8 @@ Domesticating a batch of parts with PDF report
                         standard=BUILTIN_STANDARDS.EMMA)
 
 
-
-
-(see docs for more potions)
-
-.. code:: python
-
-from genedom import BarcodesCollection
-
-    barcodes_collection = BarcodesCollection.from_specs(
-        n_barcodes=96, barcode_length=20,
-        forbidden_enzymes=('BsaI', 'BsmBI', 'BbsI'))
-
-    barcodes_collection.to_fasta('example_barcodes_collection.fa')
-
 Installation
 -------------
-
 
 You can install Genedom through PIP (coming soon)
 
