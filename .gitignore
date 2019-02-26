@@ -44,3 +44,5 @@ nosetests.xml
 .pypirc
 .cache
 .vscode
+
+docs/_build

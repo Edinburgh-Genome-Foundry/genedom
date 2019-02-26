@@ -52,8 +52,11 @@ Here is an example of summary report:
     <br /><br />
     </p>
 
-Usage
------
+
+You can also use Genedom online via ``this web app <https://cuba.genomefoundry.org/domesticate_part_batches>``_.
+
+Usage examples
+---------------
 
 Simple domestication of one part
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,21 +103,6 @@ Domesticating a batch of parts with PDF report
                         barcodes=barcodes,  # optional
                         standard=BUILTIN_STANDARDS.EMMA)
 
-
-
-
-(see docs for more potions)
-
-.. code:: python
-
-from genedom import BarcodesCollection
-
-    barcodes_collection = BarcodesCollection.from_specs(
-        n_barcodes=96, barcode_length=20,
-        forbidden_enzymes=('BsaI', 'BsmBI', 'BbsI'))
-
-    barcodes_collection.to_fasta('example_barcodes_collection.fa')
-
 Installation
 -------------
 
@@ -139,3 +127,31 @@ Genedom is an open-source software originally written at the `Edinburgh Genome F
 <http://www.genomefoundry.org>`_ by `Zulko <https://github.com/Zulko>`_
 and `released on Github <https://github.com/Edinburgh-Genome-Foundry/genedom>`_ under the MIT licence (copyright Edinburgh Genome Foundry).
 Everyone is welcome to contribute !
+
+More biology software
+-----------------------
+
+.. image:: https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/Edinburgh-Genome-Foundry.github.io/master/static/imgs/logos/egf-codon-horizontal.png
+ :target: https://edinburgh-genome-foundry.github.io/
+
+Saboteurs is part of the `EGF Codons <https://edinburgh-genome-foundry.github.io/>`_ synthetic biology software suite for DNA design, manufacturing and validation.
+
+
+.. toctree::
+    :hidden:
+    :maxdepth: 3
+
+    self
+
+
+.. toctree::
+   :hidden:
+   :caption: Reference
+   :maxdepth: 3
+
+   ref
+
+
+.. _Github: https://github.com/EdinburghGenomeFoundry/genedom
+.. _PYPI: https://pypi.python.org/pypi/dnachisel
+
