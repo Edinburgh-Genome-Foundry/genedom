@@ -22,11 +22,11 @@ import matplotlib.cm as cm
 
 from .biotools import reverse_complement, sequence_to_record, annotate_record
 from .StandardDomesticatorsSet import StandardDomesticatorsSet
+from .DomesticationResult import DomesticationResult
 
 def nan_to_empty_string(val):
     """Return the value unless it is NaN, then it returns an empty string."""
     return val if (isinstance(val, str) or not np.isnan(val)) else ''
-
 
 class PartDomesticator:
     """Generic domesticator.
@@ -111,21 +111,40 @@ class PartDomesticator:
         is_cds
           If True, sequence edits are restricted to synonymous mutations.
 
-
         codon_optimization
+          Either None for no codon optimization or the name of an organism
+          supported by DnaChisel.
         
         extra_constraints
+          List of extra constraints to apply to the domesticated sequences.
+          Each constraint is either a DnaChisel constraint or a function
+          (dna_sequence => DnaChisel constraint).
         
         extra_objectives
+          List of extra optimization objectives to apply to the domesticated
+          sequences. Each objective is either a DnaChisel constraint or a
+          function (dna_sequence => DnaChisel constraint).
         
         final_record_target
+          Path to the file where to write the final genbank
         
         edit
-          Turn to True to allow any kind of edits
+          Turn to True to allow sequence edits (if it is false and no all
+          constraints are originally satisfied, a failed domestication result
+          (i.e. with attribute ``success`` set to False) will be returned.
         
         report_target
           Target for the sequence optimization report (a folder path, or a zip
           path)
+        
+        barcode
+          A sequence of DNA that will be added to the left of the sequence once
+          the domestication is done.
+
+        barcode_spacer
+          Nucleotides to be added between the barcode and the enzyme (optional,
+          the idea here is that they will make sure to avoid the creation of
+          unwanted cutting sites).
 
         Returns
         -------
@@ -198,11 +217,13 @@ class PartDomesticator:
         if final_record_target is not None:
             SeqIO.write(final_record, final_record_target, 'genbank')
 
-        return (final_record, edits_record, report_data,
-                optimization_successful, message)
+        return DomesticationResult(problem.sequence_before, final_record,
+                                   edits_record, report_data,
+                                   optimization_successful, message)
 
 
     def details_list(self):
+        """List of details for representing the domesticator in reports."""
         return [(label, value) for (label, value) in [
             ("Name", self.name),
             ("Description", self.description),
@@ -211,6 +232,7 @@ class PartDomesticator:
         ] if value not in (None, "")]
 
     def html_details(self):
+        """HTML representation of the ``details_list``, for reports."""
         return "<br />".join([
             "<b>%s</b>: %s" % (name, value)
             for (name, value) in self.details_list()
@@ -218,15 +240,58 @@ class PartDomesticator:
 
     @staticmethod
     def plot_record(record, ax=None):
+        """Plot the given record with a custom DnaFeaturesViewer plotter."""
         translator = SpecAnnotationsTranslator()
         gr_record = translator.translate_record(record)
         return gr_record.plot(ax=ax)
 
 
 class GoldenGateDomesticator(PartDomesticator):
+    """Special domesticator class for Golden-Gate standards
+    
+    Parameters
+    ----------
+
+    left_overhang
+      4bp overhang to be added on the left
+    
+    right_overhang
+      4bp overhang to be added on the right
+    
+    left_addition
+      Extra sequence of DNA to be systematically added on the left of each part
+      between the enzyme site and the rest of the sequence.
+    
+    right_addition
+      Extra sequence to be systematically added on the right of each part
+      between the enzyme site and the rest of the sequence.
+    
+    enzyme
+      Enzyme used for the Golden Gate assembly. This enzyme will be added on
+      the flanks of the sequence, and the internal sequence will be protected
+      against sites from this enzyme during optimization.
+    
+    extra_avoided_sites
+      Other enzymes from which the sequence should be protected during
+      optimization in addition to the assembly ``enzyme``.
+    
+    description
+      Description of the domesticator as it will appear in reports.
+    
+    name
+      Name of the domesticator as it will appear in reports
+
+    constraints
+      Either Dnachisel constraints or functions (sequence => constraint) to be
+      applied to the sequence for optimization
+
+    objectives
+      Either Dnachisel objectives or functions (sequence => objective) to be
+      applied to the sequence for optimization.
+    """
 
     def __init__(self, left_overhang, right_overhang, left_addition='',
-                 right_addition='', enzyme='BsmBI',
+                 right_addition='', enzyme='BsmBI', extra_avoided_sites=(),
                  description='Golden Gate domesticator',
                  name='unnamed_domesticator', constraints=(), objectives=()):
         self.enzyme = enzyme
@@ -244,9 +309,11 @@ class GoldenGateDomesticator(PartDomesticator):
         right_flank = (right_addition + right_overhang +
                        (self.enzyme_seq + "A").reverse_complement())
         constraints = list(constraints) + [
-            lambda seq: AvoidPattern(
+            (lambda seq: AvoidPattern(
                 enzyme=enzyme,
-                location=Location(len(left_flank), len(left_flank) + len(seq)))
+                location=Location(len(left_flank),
+                                  len(left_flank) + len(seq))))
+            for enz in ([enzyme] + list(extra_avoided_sites))
         ]
         PartDomesticator.__init__(self, left_flank=left_flank,
                                   right_flank=right_flank,
@@ -271,6 +338,22 @@ class GoldenGateDomesticator(PartDomesticator):
 
     @staticmethod
     def standard_from_spreadsheet(path=None, dataframe=None, name_prefix=''):
+        """Parse a spreadsheet into a standard with Golden Gate domesticators.
+
+        The input should be a table with columns names as follows:
+        slot_name, left_overhang, right_overhang, left_addition,
+        right_addition, enzyme, extra_avoided_sites, description.
+
+        Parameters
+        ----------
+
+        path
+          Path to a CSV or XLS(X) file. A dataframe can be provided instead.
+        
+        dataframe
+          A pandas Dataframe which can be provided instead of a path
+          
+        """
         if path is not None:
             if path.lower().endswith(".csv"):
                 dataframe = pandas.read_csv(path)
@@ -283,6 +366,9 @@ class GoldenGateDomesticator(PartDomesticator):
                 left_addition=nan_to_empty_string(row.left_addition),
                 right_addition=nan_to_empty_string(row.right_addition),
                 enzyme=row.enzyme,
+                extra_avoided_sites = [
+                  e.strip() for e in row.extra_avoided_sites.split(',')
+                ] if hasattr(row.extra_avoided_sites, 'split') else [],
                 description=row.description,
                 name=name_prefix + row.slot_name
             ))

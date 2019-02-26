@@ -1,0 +1,33 @@
+LOCUS       .                        543 bp    DNA              UNK 01-JAN-1980
+DEFINITION  ..
+ACCESSION   <unknown id>
+VERSION     <unknown id>
+KEYWORDS    .
+SOURCE      .
+  ORGANISM  .
+            .
+FEATURES             Location/Qualifiers
+     enhancer        2..304
+                     /note="CMV enhancer"
+                     /note="human cytomegalovirus immediate early enhancer"
+     promoter        305..507
+                     /note="CMV promoter"
+                     /note="human cytomegalovirus (CMV) immediate early
+                     promoter"
+     source          1..543
+                     /source="Exported"
+     misc_feature    1..543
+                     /source="p18_CMVp"
+                     /note="From p18_CMVp"
+ORIGIN
+        1 cgttacataa cttacggtaa atggcccgcc tggctgaccg cccaacgacc cccgcccatt
+       61 gacgtcaata atgacgtatg ttcccatagt aacgccaata gggactttcc attgacgtca
+      121 atgggtggag tatttacggt aaactgccca cttggcagta catcaagtgt atcatatgcc
+      181 aagtacgccc cctattgacg tcaatgacgg taaatggccc gcctggcatt atgcccagta
+      241 catgacctta tgggactttc ctacttggca gtacatctac gtattagtca tcgctattac
+      301 catggtgatg cggttttggc agtacatcaa tgggcgtgga tagcggtttg actcacgggg
+      361 atttccaagt ctccacccca ttgacgtcaa tgggagtttg ttttggcacc aaaatcaacg
+      421 ggactttcca aaatgtcgta acaactccgc cccattgacg caaatgggcg gtaggcgtgt
+      481 acggtgggag gtctatataa gcagagctaa ttcgtcgact ggatccggta ccgaggagat
+      541 ctg
+//

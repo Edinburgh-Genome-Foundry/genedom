@@ -36,7 +36,7 @@ def genedom_pug_to_html(template, **context):
     return pug_to_html(template, **context)
 
 
-def domestication_report(target, domestication_infos, domesticators):
+def write_pdf_domestication_report(target, domestication_infos, domesticators):
     summary_table = dataframe_to_html(
         domestication_infos,
         extra_classes=("definition",)

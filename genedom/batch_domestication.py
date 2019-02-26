@@ -9,8 +9,9 @@ import flametree
 from sequenticon import sequenticon
 
 from .PartDomesticator import PartDomesticator
-from .reports import domestication_report
-from .biotools import sanitize_and_uniquify, sequence_to_record, annotate_record
+from .reports import write_pdf_domestication_report
+from .biotools import (sanitize_and_uniquify, sequence_to_record,
+                       annotate_record, write_record)
 
 def batch_domestication(records, target,
                         domesticator=None,
@@ -115,6 +116,7 @@ def batch_domestication(records, target,
     columns = ["Record", "Ordering Name", "Domesticator",
                "Domesticated Record", "Added bp", "Edited bp"]
 
+    # DOMESTICATE ALL PARTS, APPEND BARCODE, GATHER DATA
     for i, record in logger.iter_bar(record=list(enumerate(records))):
         record = deepcopy(record)
         original_id = record.id
@@ -140,39 +142,44 @@ def batch_domestication(records, target,
             annotate_record(barcode, label="BARCODE" + barcode_id)
         else:
             barcode = None
-
-        final, edits, report, success, msg = record_domesticator.domesticate(
+        # final, edits, report, success, msg
+        domestication_results = record_domesticator.domesticate(
             record, report_target=report_target, edit=allow_edits)
-        if not success:
+        if not domestication_results.success:
             nfails += 1
         if barcode is not None:
-            final = barcode + barcode_spacer + final
-        final.original_id = original_id
-        final.id = domesticated_id.replace(' ', '_')
-        SeqIO.write(final, domesticated_dir._file(domesticated_file_name),
+            domestication_results.record_after = (
+                barcode + barcode_spacer + domestication_results.record_after)
+        domestication_results.record_after.original_id = original_id
+        domestication_results.record_after.id = domesticated_id.replace(' ', '_')
+        SeqIO.write(domestication_results.record_after,
+                    domesticated_dir._file(domesticated_file_name),
                     "genbank")
-        domesticated_records.append(final)
+        domesticated_records.append(domestication_results.record_after)
         if include_original_records:
-            record.id = record.id[:20]
-            SeqIO.write(final, original_dir._file(original_id + ".gb"),
-                        "genbank")
-        n_edits = sum([len(f) for f in edits.features
-                       if f.qualifiers.get("is_edit", False)])
-        added_bp = len(final) - len(record)
+            write_record(domestication_results.record_after,
+                         original_dir._file(original_id + ".gb"))
+        n_edits = domestication_results.number_of_edits()
+        added_bp = len(domestication_results.record_after) - len(record)
         before_seqicon = sequenticon(record, output_format="html_image")
-        after_seqicon = sequenticon(final, output_format="html_image")
+        after_seqicon = sequenticon(domestication_results.record_after,
+                                    output_format="html_image")
 
         infos.append({
             "id": original_id,
             "Record": before_seqicon + original_id,
             "Domesticator": record_domesticator.name,
-            "Domesticated Record": ("Failed: " + msg) if not success
+            "Domesticated Record": ("Failed: " + domestication_results.message)
+                                   if not domestication_results.success
                                    else (after_seqicon + domesticated_id),
             "Added bp": added_bp,
             "Edited bp": n_edits
         })
         if barcode is not None:
             infos[-1]['Barcode'] = barcode_id
+    
+    # WRITE PDF REPORT
+
     sanitizing_table = sanitize_and_uniquify([info['id'] for info in infos])
     order_id_dataframe = pandas.DataFrame(list(sanitizing_table.items()),
                                           columns=["sequence", "order_id"])
@@ -187,8 +194,11 @@ def batch_domestication(records, target,
     infos_dataframe = pandas.DataFrame(infos, columns=columns)
     infos_dataframe.sort_values('Order ID', inplace=True)
     domesticators = sorted(domesticators, key=lambda d: d.name)
-    domestication_report(root._file("Report.pdf"), infos_dataframe,
-                         domesticators)
+    write_pdf_domestication_report(root._file("Report.pdf"), infos_dataframe,
+                             domesticators)
+    
+    # WRITE THE SEQUENCES TO ORDER AS FASTA
+
     order_dir = root._dir('sequences_to_order', replace=True)
     for r in domesticated_records:
         r.id = sanitizing_table[r.original_id]
@@ -196,6 +206,9 @@ def batch_domestication(records, target,
         r.description = ''
     SeqIO.write(domesticated_records, order_dir._file("sequences_to_order.fa"),
                 "fasta")
+
+    # WRITE THE SEQUENCES TO ORDER AS EXCEL
+    
     df = pandas.DataFrame.from_records(
         sorted([
             {'sequence': str(rec.seq).upper(),

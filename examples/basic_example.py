@@ -1,7 +1,6 @@
-from genedom import GoldenGateDomesticator
-from dnachisel import random_dna_sequence
-
+from genedom import GoldenGateDomesticator, random_dna_sequence
 
 sequence = random_dna_sequence(2000, seed=123)
 domesticator = GoldenGateDomesticator("ATTC", "ATCG")
-final_record, edits_record, data = domesticator.domesticate(sequence)
+domestication_results = domesticator.domesticate(sequence, edit=True)
+print (domestication_results.summary())

@@ -1,0 +1,44 @@
+LOCUS       .                        716 bp    DNA              UNK 01-JAN-1980
+DEFINITION  ..
+ACCESSION   <unknown id>
+VERSION     <unknown id>
+KEYWORDS    .
+SOURCE      .
+  ORGANISM  .
+            .
+FEATURES             Location/Qualifiers
+     misc_feature    1..11
+                     /note="KozaK"
+     CDS             9..11
+                     /codon_start=1
+                     /note="ATG"
+                     /translation="M"
+     CDS             12..716
+                     /codon_start=1
+                     /note="mNeonGreen"
+                     /product="bright monomeric yellow-green fluorescent protein
+                     derived from LanYFP (Shaner et al., 2013)"
+                     /translation="VSKGEEDNMASLPATHELHIFGSINGVDFDMVGQGTGNPNDGYEE
+                     LNLKSTKGDLQFSPWILVPHIGYGFHQYLPYPDGMSPFQAAMVDGSGYQVHRTMQFEDG
+                     ASLTVNYRYTYEGSHIKGEAQVKGTGFPADGPVMTNSLTAADWCRSKKTYPNDKTIIST
+                     FKWSYTTGNGKRYRSTARTTYTFAKPMAANYLKNQPMYVFRKTELKHSKTELNFKEWQK
+                     AFTDVMGMDELYK"
+     source          1..716
+                     /source="Exported"
+     misc_feature    1..716
+                     /source="p19_mNeoGreen"
+                     /note="From p19_mNeoGreen"
+ORIGIN
+        1 ccgccaccat ggtgagcaag ggcgaggagg ataacatggc ctctctccca gcgacacatg
+       61 agttacacat ctttggctcc atcaacggtg tggactttga catggtgggt cagggcaccg
+      121 gcaatccaaa tgatggttat gaggagttaa acctgaagtc caccaagggt gacctccagt
+      181 tctccccctg gattctggtc cctcatatcg ggtatggctt ccatcagtac ctgccctacc
+      241 ctgacgggat gtcgcctttc caggccgcca tggtagatgg ctccggatac caagtccatc
+      301 gcacaatgca gtttgaagat ggtgcctccc ttactgttaa ctaccgctac acctacgagg
+      361 gaagccacat caaaggagag gcccaggtga aggggactgg tttccctgct gacggtcctg
+      421 tgatgaccaa ctcgctgacc gctgcggact ggtgcaggtc gaagaagact taccccaacg
+      481 acaaaaccat catcagtacc tttaagtgga gttacaccac tggaaatggc aagcgctacc
+      541 ggagcactgc gcggaccacc tacacctttg ccaagccaat ggcggctaac tatctgaaga
+      601 accagccgat gtacgtgttc cgtaagacgg agctcaagca ctccaagacc gagctcaact
+      661 tcaaggagtg gcaaaaggcc tttaccgatg tgatgggcat ggacgagctg tacaag
+//
