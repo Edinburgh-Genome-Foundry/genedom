@@ -9,7 +9,7 @@ from dnachisel import (AvoidPattern, reverse_complement, reverse_translate,
                        DnaOptimizationProblem, EnforceTranslation,
                        annotate_record, CodonOptimize, Location,
                        sequence_to_biopython_record, random_dna_sequence,
-                       AvoidChanges, AvoidChanges)
+                       AvoidChanges, AvoidChanges, EnzymeSitePattern)
 
 from dnachisel.reports import (optimization_with_report,
                                SpecAnnotationsTranslator)
@@ -310,7 +310,7 @@ class GoldenGateDomesticator(PartDomesticator):
                        (self.enzyme_seq + "A").reverse_complement())
         constraints = list(constraints) + [
             (lambda seq: AvoidPattern(
-                enzyme=enzyme,
+                EnzymeSitePattern(enzyme),
                 location=Location(len(left_flank),
                                   len(left_flank) + len(seq))))
             for enz in ([enzyme] + list(extra_avoided_sites))

@@ -1,5 +1,7 @@
 import os
-import dnachisel as dc
+from dnachisel import (AllowPrimer, DnaOptimizationProblem, EnzymeSitePattern,
+                       EnforceSequence, EnforceGCContent, AvoidPattern,
+                       random_dna_sequence)
 from collections import OrderedDict
 from .biotools import sequence_to_record, annotate_record, write_record
 
@@ -70,12 +72,12 @@ class BarcodesCollection(OrderedDict):
         units_coordinates = [(i, i + unit_length)
                             for i in range(0, seq_len, unit_length)]
         constraints = [
-            dc.AvoidPattern(enzyme=enzyme)
+            AvoidPattern(EnzymeSitePattern(enzyme))
             for enzyme in forbidden_enzymes
         ]
         for start, end in units_coordinates:
             constraints += [
-                dc.AllowPrimer(
+                AllowPrimer(
                     tmin=barcode_tmin,
                     tmax=barcode_tmax,
                     max_homology_length=max_homology_length,
@@ -83,12 +85,12 @@ class BarcodesCollection(OrderedDict):
                     max_heterodim_tm=5,
                     location=(start, end - len(spacer))
                 ),
-                dc.EnforceSequence(spacer, location=(end - len(spacer), end)),
-                dc.EnforceGCContent(mini=0.4, maxi=0.6,
+                EnforceSequence(spacer, location=(end - len(spacer), end)),
+                EnforceGCContent(mini=0.4, maxi=0.6,
                                     location=(start, end - len(spacer)))   
             ]
-        problem = dc.DnaOptimizationProblem(
-            sequence=dc.random_dna_sequence(seq_len),
+        problem = DnaOptimizationProblem(
+            sequence= random_dna_sequence(seq_len),
             constraints=constraints
         )
         problem.logger.ignored_bars.add('location')
