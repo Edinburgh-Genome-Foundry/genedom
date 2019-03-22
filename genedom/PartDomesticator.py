@@ -11,9 +11,7 @@ from dnachisel import (AvoidPattern, reverse_complement, reverse_translate,
                        sequence_to_biopython_record, random_dna_sequence,
                        AvoidChanges, AvoidChanges, EnzymeSitePattern)
 
-from dnachisel.reports import (optimization_with_report,
-                               SpecAnnotationsTranslator)
-
+from dnachisel.reports import SpecAnnotationsTranslator
 
 from dna_features_viewer import BiopythonTranslator
 import matplotlib.pyplot as plt
@@ -186,9 +184,8 @@ class PartDomesticator:
         optimization_successful = True
         message = ""
         if report_target is not None:
-            (success, message, report_data) = optimization_with_report(
+            (success, message, report_data) = problem.optimize_with_report(
                 target=report_target,
-                problem=problem,
                 project_name=self.name
             )
             optimization_successful = success
