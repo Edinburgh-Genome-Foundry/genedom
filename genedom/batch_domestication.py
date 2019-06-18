@@ -10,18 +10,42 @@ from sequenticon import sequenticon
 
 from .PartDomesticator import PartDomesticator
 from .reports import write_pdf_domestication_report
-from .biotools import (sanitize_and_uniquify, sequence_to_record,
-                       annotate_record, write_record)
+from .biotools import (
+    sanitize_and_uniquify,
+    sequence_to_record,
+    annotate_record,
+    write_record,
+)
 
-def batch_domestication(records, target,
-                        domesticator=None,
-                        standard=None,
-                        allow_edits=False,
-                        domesticated_suffix="",
-                        include_optimization_reports=True,
-                        include_original_records=True,
-                        barcodes=(), barcode_order='same_as_records',
-                        barcode_spacer='AA', logger="bar"):
+
+def detect_non_unique_elements(elements):
+    seen = {}
+    for e in elements:
+        if e not in seen:
+            seen[e] = [e]
+        else:
+            seen[e].append(e)
+    return [
+        (e, len(instances))
+        for e, instances in seen.items()
+        if len(instances) > 1
+    ]
+
+
+def batch_domestication(
+    records,
+    target,
+    domesticator=None,
+    standard=None,
+    allow_edits=False,
+    domesticated_suffix="",
+    include_optimization_reports=True,
+    include_original_records=True,
+    barcodes=(),
+    barcode_order="same_as_records",
+    barcode_spacer="AA",
+    logger="bar",
+):
     """Domesticate a batch of parts according to some domesticator/standard.
     
     Examples
@@ -90,6 +114,16 @@ def batch_domestication(records, target,
       Either "bar" or None for no logger or any Proglog ProgressBarLogger.
 
     """
+    non_unique_record_ids = detect_non_unique_elements([r.id for r in records])
+    if len(non_unique_record_ids):
+        raise ValueError(
+            "The following record IDs have several occurences "
+            "in the provided records, which would lead to "
+            "overwritten record files: "
+            + ", ".join(
+                ["%s (%s)" for (e, instances) in non_unique_record_ids]
+            )
+        )
     logger = proglog.default_bar_logger(logger, min_time_interval=0.2)
     root = flametree.file_tree(target, replace=True)
     domesticated_dir = root._dir("domesticated")
@@ -99,12 +133,12 @@ def batch_domestication(records, target,
         errors_dir = root._dir("error_reports")
     if standard is not None:
         domesticator = standard.record_to_domesticator
-    
-    if hasattr(barcodes, 'items'):
+
+    if hasattr(barcodes, "items"):
         barcodes = list(barcodes.items())
     if len(barcodes):
         barcodes = [b for b, r in zip(itertools.cycle(barcodes), records)]
-    if barcode_order == 'by_size':
+    if barcode_order == "by_size":
         lengths = [len(r) for r in records]
         barcodes = [b for _, b in sorted(zip(lengths, barcodes))]
 
@@ -113,8 +147,14 @@ def batch_domestication(records, target,
     domesticators = set()
     nfails = 0
     domesticated_records = []
-    columns = ["Record", "Ordering Name", "Domesticator",
-               "Domesticated Record", "Added bp", "Edited bp"]
+    columns = [
+        "Record",
+        "Ordering Name",
+        "Domesticator",
+        "Domesticated Record",
+        "Added bp",
+        "Edited bp",
+    ]
 
     # DOMESTICATE ALL PARTS, APPEND BARCODE, GATHER DATA
     for i, record in logger.iter_bar(record=list(enumerate(records))):
@@ -144,82 +184,112 @@ def batch_domestication(records, target,
             barcode = None
         # final, edits, report, success, msg
         domestication_results = record_domesticator.domesticate(
-            record, report_target=report_target, edit=allow_edits)
+            record, report_target=report_target, edit=allow_edits
+        )
         if not domestication_results.success:
             nfails += 1
         if barcode is not None:
             domestication_results.record_after = (
-                barcode + barcode_spacer + domestication_results.record_after)
+                barcode + barcode_spacer + domestication_results.record_after
+            )
         domestication_results.record_after.original_id = original_id
-        domestication_results.record_after.id = domesticated_id.replace(' ', '_')
-        SeqIO.write(domestication_results.record_after,
-                    domesticated_dir._file(domesticated_file_name),
-                    "genbank")
+        domestication_results.record_after.id = domesticated_id.replace(
+            " ", "_"
+        )
+        SeqIO.write(
+            domestication_results.record_after,
+            domesticated_dir._file(domesticated_file_name),
+            "genbank",
+        )
         domesticated_records.append(domestication_results.record_after)
         if include_original_records:
-            write_record(domestication_results.record_after,
-                         original_dir._file(original_id + ".gb"))
+            write_record(
+                domestication_results.record_after,
+                original_dir._file(original_id + ".gb"),
+            )
         n_edits = domestication_results.number_of_edits()
         added_bp = len(domestication_results.record_after) - len(record)
         before_seqicon = sequenticon(record, output_format="html_image")
-        after_seqicon = sequenticon(domestication_results.record_after,
-                                    output_format="html_image")
+        after_seqicon = sequenticon(
+            domestication_results.record_after, output_format="html_image"
+        )
 
-        infos.append({
-            "id": original_id,
-            "Record": before_seqicon + original_id,
-            "Domesticator": record_domesticator.name,
-            "Domesticated Record": ("Failed: " + domestication_results.message)
-                                   if not domestication_results.success
-                                   else (after_seqicon + domesticated_id),
-            "Added bp": added_bp,
-            "Edited bp": n_edits
-        })
+        infos.append(
+            {
+                "id": original_id,
+                "Record": before_seqicon + original_id,
+                "Domesticator": record_domesticator.name,
+                "Domesticated Record": (
+                    "Failed: " + domestication_results.message
+                )
+                if not domestication_results.success
+                else (after_seqicon + domesticated_id),
+                "Added bp": added_bp,
+                "Edited bp": n_edits,
+            }
+        )
         if barcode is not None:
-            infos[-1]['Barcode'] = barcode_id
-    
+            infos[-1]["Barcode"] = barcode_id
+
     # WRITE PDF REPORT
 
-    sanitizing_table = sanitize_and_uniquify([info['id'] for info in infos])
-    order_id_dataframe = pandas.DataFrame(list(sanitizing_table.items()),
-                                          columns=["sequence", "order_id"])
-    order_id_dataframe.to_csv(root._file("order_ids.csv").open('w'),
-                              index=False)
+    sanitizing_table = sanitize_and_uniquify([info["id"] for info in infos])
+    order_id_dataframe = pandas.DataFrame(
+        list(sanitizing_table.items()), columns=["sequence", "order_id"]
+    )
+    order_id_dataframe.to_csv(
+        root._file("order_ids.csv").open("w"), index=False
+    )
     for info in infos:
-        info['Order ID'] = sanitizing_table[info['id']]
-    columns = ["Record", "Order ID", "Domesticator", "Domesticated Record",
-               "Added bp", "Edited bp"]
+        info["Order ID"] = sanitizing_table[info["id"]]
+    columns = [
+        "Record",
+        "Order ID",
+        "Domesticator",
+        "Domesticated Record",
+        "Added bp",
+        "Edited bp",
+    ]
     if "Barcode" in infos[0]:
         columns.append("Barcode")
     infos_dataframe = pandas.DataFrame(infos, columns=columns)
-    infos_dataframe.sort_values('Order ID', inplace=True)
+    infos_dataframe.sort_values("Order ID", inplace=True)
     domesticators = sorted(domesticators, key=lambda d: d.name)
-    write_pdf_domestication_report(root._file("Report.pdf"), infos_dataframe,
-                             domesticators)
-    
+    write_pdf_domestication_report(
+        root._file("Report.pdf"), infos_dataframe, domesticators
+    )
+
     # WRITE THE SEQUENCES TO ORDER AS FASTA
 
-    order_dir = root._dir('sequences_to_order', replace=True)
+    order_dir = root._dir("sequences_to_order", replace=True)
     for r in domesticated_records:
         r.id = sanitizing_table[r.original_id]
-        r.name = ''
-        r.description = ''
-    SeqIO.write(domesticated_records, order_dir._file("sequences_to_order.fa"),
-                "fasta")
+        r.name = ""
+        r.description = ""
+    SeqIO.write(
+        domesticated_records, order_dir._file("sequences_to_order.fa"), "fasta"
+    )
 
     # WRITE THE SEQUENCES TO ORDER AS EXCEL
-    
+
     df = pandas.DataFrame.from_records(
-        sorted([
-            {'sequence': str(rec.seq).upper(),
-             'length': len(rec),
-             'sequence name': rec.id}
-            for rec in domesticated_records
-        ], key=lambda d: d['sequence name']),
-        columns=['sequence name', 'length', 'sequence']
+        sorted(
+            [
+                {
+                    "sequence": str(rec.seq).upper(),
+                    "length": len(rec),
+                    "sequence name": rec.id,
+                }
+                for rec in domesticated_records
+            ],
+            key=lambda d: d["sequence name"],
+        ),
+        columns=["sequence name", "length", "sequence"],
     )
-    df.to_excel(order_dir._file("sequences_to_order.xls").open("wb"),
-                index=False)
-    df.to_csv(order_dir._file("all_domesticated_parts.csv").open("w"),
-              index=False)
+    df.to_excel(
+        order_dir._file("sequences_to_order.xls").open("wb"), index=False
+    )
+    df.to_csv(
+        order_dir._file("all_domesticated_parts.csv").open("w"), index=False
+    )
     return nfails, root._close()
