@@ -121,7 +121,10 @@ def batch_domestication(
             "in the provided records, which would lead to "
             "overwritten record files: "
             + ", ".join(
-                ["%s (%s)" for (e, instances) in non_unique_record_ids]
+                [
+                    "%s (%s)" % (e, instances)
+                    for (e, instances) in non_unique_record_ids
+                ]
             )
         )
     logger = proglog.default_bar_logger(logger, min_time_interval=0.2)
