@@ -4,6 +4,7 @@ import pandas
 import numpy as np
 
 from Bio import SeqIO, Restriction
+from Bio.SeqRecord import SeqRecord
 
 from dnachisel import (
     AvoidPattern,
@@ -78,6 +79,7 @@ class PartDomesticator:
         right_flank="",
         constraints=(),
         objectives=(),
+        cds_by_default=False,
         description=None,
         simultaneous_mutations=1,
         minimize_edits=True,
@@ -99,12 +101,13 @@ class PartDomesticator:
         self.logger = logger
         self.simultaneous_mutations = simultaneous_mutations
         self.minimize_edits = minimize_edits
+        self.cds_by_default = cds_by_default
 
     def domesticate(
         self,
         dna_sequence=None,
         protein_sequence=None,
-        is_cds=False,
+        is_cds='default',
         codon_optimization=None,
         extra_constraints=(),
         extra_objectives=(),
@@ -169,6 +172,15 @@ class PartDomesticator:
 
         final_record, edits_record, report_data, success, msg
         """
+        if is_cds == 'default':
+            return cds_by_default
+        if isinstance(dna_sequence, SeqRecord):
+            problem = DnaOptimizationProblem.from_record(dna_sequence)
+            for spec in problem.constraints + problem.objectives:
+                spec.location += len(self.left_flank)
+            extra_constraints = list(extra_constraints) + problem.constraints
+            extra_objectives = list(extra_constraints) + problem.objectives
+
         if protein_sequence is not None:
             is_cds = True
             dna_sequence = reverse_translate(protein_sequence)
@@ -435,6 +447,9 @@ class GoldenGateDomesticator(PartDomesticator):
                             if hasattr(row.extra_avoided_sites, "split")
                             else [],
                             description=row.description,
+                            default_is_cds=(row.is_cds == 'yes')
+                            if hasattr(row, "is_cds")
+                            else False
                             name=name_prefix + row.slot_name,
                         ),
                     )
