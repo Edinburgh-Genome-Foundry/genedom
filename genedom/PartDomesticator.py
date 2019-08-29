@@ -173,7 +173,7 @@ class PartDomesticator:
         final_record, edits_record, report_data, success, msg
         """
         if is_cds == 'default':
-            return cds_by_default
+            is_cds = self.cds_by_default
         if isinstance(dna_sequence, SeqRecord):
             problem = DnaOptimizationProblem.from_record(dna_sequence)
             for spec in problem.constraints + problem.objectives:
@@ -340,6 +340,7 @@ class GoldenGateDomesticator(PartDomesticator):
         extra_avoided_sites=(),
         description="Golden Gate domesticator",
         name="unnamed_domesticator",
+        cds_by_default=False,
         constraints=(),
         objectives=(),
     ):
@@ -379,6 +380,7 @@ class GoldenGateDomesticator(PartDomesticator):
             objectives=objectives,
             description=description,
             name=name,
+            cds_by_default=cds_by_default
         )
 
     def __repr__(self):
@@ -447,9 +449,9 @@ class GoldenGateDomesticator(PartDomesticator):
                             if hasattr(row.extra_avoided_sites, "split")
                             else [],
                             description=row.description,
-                            default_is_cds=(row.is_cds == 'yes')
+                            cds_by_default=(row.is_cds == 'yes')
                             if hasattr(row, "is_cds")
-                            else False
+                            else False,
                             name=name_prefix + row.slot_name,
                         ),
                     )
