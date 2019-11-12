@@ -1,0 +1,15 @@
+slot_name,left_overhang,right_overhang,enzyme,left_addition,right_addition,extra_avoided_sites,description
+p1,CCCT,AACG,BsaI,,,,For slot p1 of the YTK standard
+p2,AACG,TATG,BsaI,,,,For slot p2 of the YTK standard
+p3,TATG,ATCC,BsaI,,,,For slot p3 of the YTK standard
+p3a,TATG,TTCT,BsaI,,,,For slot p4 of the YTK standard
+p3b,TTCT,ATCC,BsaI,,,,For slot p5 of the YTK standard
+p4,ATCC,GCTG,BsaI,,,,For slot p6 of the YTK standard
+p4a,ATCC,TGGC,BsaI,,,,For slot p7 of the YTK standard
+p4b,TGGC,CGAC,BsaI,,,,For slot p8 of the YTK standard
+p5,GCTG,TACA,BsaI,,,,For slot p8a of the YTK standard
+p6,TACA,GAGT,BsaI,,,,For slot p8b of the YTK standard
+p7,GAGT,CCGA,BsaI,,,,For slot p9 of the YTK standard
+p8,CCGA,CCCT,BsaI,,,,For slot p10 of the YTK standard
+p8a,CCGA,CAAT,BsaI,,,,For slot p11 of the YTK standard
+p8b,CAAT,CCCT,BsaI,,,,For slot p12 of the YTK standard

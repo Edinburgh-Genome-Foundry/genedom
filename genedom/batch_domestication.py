@@ -54,6 +54,14 @@ def batch_domestication(
     >>> from genedom import BUILTIN_STANDARDS, batch_domestication
     >>> batch_domestication(some_records, standard=BUILTIN_STANDARDS.EMMA)
 
+
+    Returns
+    -------
+      (n_fails, zip_data)
+        Where n_fails indicate how many optimizations have failed, and
+        zip_data is binary zip data (bytes), in the case where
+        target="@memory".
+
     Parameters
     ----------
 
