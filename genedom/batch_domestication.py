@@ -137,7 +137,7 @@ def batch_domestication(
         )
     logger = proglog.default_bar_logger(logger, min_time_interval=0.2)
     root = flametree.file_tree(target, replace=True)
-    domesticated_dir = root._dir("domesticated")
+    domesticated_dir = root._dir("domesticated_genbanks")
     if include_original_records:
         original_dir = root._dir("original")
     if include_optimization_reports:

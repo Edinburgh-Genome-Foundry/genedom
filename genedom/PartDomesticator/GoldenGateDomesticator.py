@@ -135,7 +135,7 @@ class GoldenGateDomesticator(PartDomesticator):
 
     def details_list(self):
         result = PartDomesticator.details_list(self) + [
-            ("Enzyme", "%s (%s)" % (self.enzyme, str(self.enzyme_seq))),
+            ("Enzyme", "%s (%s)" % (self.enzyme, str(self.enzyme_seq.seq))),
             ("Left overhang", self.left_overhang),
             ("Right overhang", self.right_overhang),
         ]
