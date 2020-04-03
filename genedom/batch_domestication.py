@@ -215,7 +215,7 @@ def batch_domestication(
         domesticated_records.append(domestication_results.record_after)
         if include_original_records:
             write_record(
-                domestication_results.record_after,
+                record,
                 original_dir._file(original_id + ".gb"),
             )
         n_edits = domestication_results.number_of_edits()
