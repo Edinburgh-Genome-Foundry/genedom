@@ -25,11 +25,7 @@ def detect_non_unique_elements(elements):
             seen[e] = [e]
         else:
             seen[e].append(e)
-    return [
-        (e, len(instances))
-        for e, instances in seen.items()
-        if len(instances) > 1
-    ]
+    return [(e, len(instances)) for e, instances in seen.items() if len(instances) > 1]
 
 
 def batch_domestication(
@@ -66,27 +62,26 @@ def batch_domestication(
     ----------
 
     records
-      List of Bioython records to be domesticated
-    
+      List of Bioython records to be domesticated.
+
     target
       Path to a folder, to a zip file, or "@memory" for in-memory report
-      generatio (the raw binary data of a zip archive is then returned)
+      generation (the raw binary data of a zip archive is then returned).
 
     domesticator
       Either a single domesticator, to be used for all parts in the batch, or
       a function f(record) => appropriate_domesticator. Note that a "standard"
-      can be provided instead
+      can be provided instead.
 
     standard
       A StandardDomesticatorsSet object which will be used to attribute a
-      specific domesticator to each part. See BUILTIN_STANDARDS for
-      examples.
+      specific domesticator to each part. See BUILTIN_STANDARDS for examples.
 
     allow_edits
       If False, sequences cannot be edited by the domesticator, only extended
       with flanks. If a sequence has for instance forbidden restriction sites,
       the domesticaton will fail for this sequence (and this will be noted in
-      the report. 
+      the report.
 
     domesticated_suffix
       Suffix to give to the domesticated parts names to differentiate them from
@@ -109,7 +104,7 @@ def batch_domestication(
       to check that the part is the one you think if your samples get mixed up).
       Note that if there are less barcodes than parts, the barcodes will cycle
       and several parts may get the same barcode (which is generally fine).
-    
+
     barcode_order
       Either "same_as_records", or "by_size" if you want your barcodes to be
       attributed from the smallest to the longest part in the batch.
@@ -117,10 +112,9 @@ def batch_domestication(
     barcode_spacer
       Sequence to appear between the barcode and the left flank of the
       domesticated part.
-    
+
     logger
       Either "bar" or None for no logger or any Proglog ProgressBarLogger.
-
     """
     non_unique_record_ids = detect_non_unique_elements([r.id for r in records])
     if len(non_unique_record_ids):
@@ -129,10 +123,7 @@ def batch_domestication(
             "in the provided records, which would lead to "
             "overwritten record files: "
             + ", ".join(
-                [
-                    "%s (%s)" % (e, instances)
-                    for (e, instances) in non_unique_record_ids
-                ]
+                ["%s (%s)" % (e, instances) for (e, instances) in non_unique_record_ids]
             )
         )
     logger = proglog.default_bar_logger(logger, min_time_interval=0.2)
@@ -204,9 +195,7 @@ def batch_domestication(
                 barcode + barcode_spacer + domestication_results.record_after
             )
         domestication_results.record_after.original_id = original_id
-        domestication_results.record_after.id = domesticated_id.replace(
-            " ", "_"
-        )
+        domestication_results.record_after.id = domesticated_id.replace(" ", "_")
         SeqIO.write(
             domestication_results.record_after,
             domesticated_dir._file(domesticated_file_name),
@@ -215,8 +204,7 @@ def batch_domestication(
         domesticated_records.append(domestication_results.record_after)
         if include_original_records:
             write_record(
-                record,
-                original_dir._file(original_id + ".gb"),
+                record, original_dir._file(original_id + ".gb"),
             )
         n_edits = domestication_results.number_of_edits()
         added_bp = len(domestication_results.record_after) - len(record)
@@ -230,9 +218,7 @@ def batch_domestication(
                 "id": original_id,
                 "Record": before_seqicon + original_id,
                 "Domesticator": record_domesticator.name,
-                "Domesticated Record": (
-                    "Failed: " + domestication_results.message
-                )
+                "Domesticated Record": ("Failed: " + domestication_results.message)
                 if not domestication_results.success
                 else (after_seqicon + domesticated_id),
                 "Added bp": added_bp,
@@ -248,9 +234,7 @@ def batch_domestication(
     order_id_dataframe = pandas.DataFrame(
         list(sanitizing_table.items()), columns=["sequence", "order_id"]
     )
-    order_id_dataframe.to_csv(
-        root._file("order_ids.csv").open("w"), index=False
-    )
+    order_id_dataframe.to_csv(root._file("order_ids.csv").open("w"), index=False)
     for info in infos:
         info["Order ID"] = sanitizing_table[info["id"]]
     columns = [
@@ -277,9 +261,7 @@ def batch_domestication(
         r.id = sanitizing_table[r.original_id]
         r.name = ""
         r.description = ""
-    SeqIO.write(
-        domesticated_records, order_dir._file("sequences_to_order.fa"), "fasta"
-    )
+    SeqIO.write(domesticated_records, order_dir._file("sequences_to_order.fa"), "fasta")
 
     # WRITE THE SEQUENCES TO ORDER AS EXCEL
 
@@ -297,10 +279,6 @@ def batch_domestication(
         ),
         columns=["sequence name", "length", "sequence"],
     )
-    df.to_excel(
-        order_dir._file("sequences_to_order.xls").open("wb"), index=False
-    )
-    df.to_csv(
-        order_dir._file("all_domesticated_parts.csv").open("w"), index=False
-    )
+    df.to_excel(order_dir._file("sequences_to_order.xls").open("wb"), index=False)
+    df.to_csv(order_dir._file("all_domesticated_parts.csv").open("w"), index=False)
     return nfails, root._close()

@@ -7,7 +7,13 @@ from snapgene_reader import snapgene_file_to_seqrecord
 
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import DNAAlphabet
+
+try:
+    # Biopython <1.78
+    from Bio.Alphabet import DNAAlphabet
+except ImportError:
+    # Biopython >=1.78
+    has_dna_alphabet = False
 from Bio.SeqFeature import SeqFeature, FeatureLocation
 from Bio import SeqIO
 
@@ -32,8 +38,7 @@ def random_dna_sequence(length, probas=None, seed=None):
     seed
       The seed to feed to the random number generator. When a seed is provided
       the random results depend deterministically on the seed, thus enabling
-      reproducibility
-
+      reproducibility.
     """
     if seed is not None:
         np.random.seed(seed)
@@ -45,18 +50,13 @@ def random_dna_sequence(length, probas=None, seed=None):
     return "".join(sequence)
 
 
-formats_dict = {
-    '.fa': 'fasta',
-    '.gb': 'genbank',
-    '.gbk': 'genbank',
-    '.dna': 'snapgene'
-}
+formats_dict = {".fa": "fasta", ".gb": "genbank", ".gbk": "genbank", ".dna": "snapgene"}
 
 
 def load_record(filename, linear=True, name="unnamed", capitalize=True):
     no_extension, extension = os.path.splitext(filename)
     fmt = formats_dict[extension]
-    if fmt == 'snapgene':
+    if fmt == "snapgene":
         record = snapgene_file_to_seqrecord(filename)
     else:
         record = SeqIO.read(filename, fmt)
@@ -74,14 +74,14 @@ def load_records(path, capitalize=True):
         return [record for p in path for record in load_records(p)]
     no_extension, extension = os.path.splitext(path)
     fmt = formats_dict[extension]
-    if fmt == 'snapgene':
+    if fmt == "snapgene":
         records = [snapgene_file_to_seqrecord(path)]
     else:
         records = list(SeqIO.parse(path, fmt))
     for i, record in enumerate(records):
         if capitalize:
             record.seq = record.seq.upper()
-        if str(record.id) in ['None', '', "<unknown id>", '.', ' ']:
+        if str(record.id) in ["None", "", "<unknown id>", ".", " "]:
             record.id = path.replace("/", "_").replace("\\", "_")
             if len(records) > 1:
                 record.id += "_%04d" % i
@@ -91,17 +91,26 @@ def load_records(path, capitalize=True):
 def complement(sequence):
     return "".join(complements_dict[c] for c in sequence)
 
+
 def reverse_complement(sequence):
     return complement(sequence)[::-1]
 
 
 def sequence_to_record(sequence, features=()):
-    return SeqRecord(Seq(sequence, alphabet=DNAAlphabet()),
-                     features=list(features))
+    if has_dna_alphabet:
+        seq = Seq(sequence, alphabet=DNAAlphabet())
+    else:
+        seq = Seq(sequence)
+
+    seqrecord = SeqRecord(seq, features=list(features))
+    seqrecord.annotations["molecule_type"] = "DNA"
+
+    return seqrecord
 
 
-def annotate_record(seqrecord, location="full", feature_type="feature",
-                    margin=0, **qualifiers):
+def annotate_record(
+    seqrecord, location="full", feature_type="feature", margin=0, **qualifiers
+):
     """Add a feature to a Biopython SeqRecord.
 
     Parameters
@@ -111,16 +120,16 @@ def annotate_record(seqrecord, location="full", feature_type="feature",
       The biopython seqrecord to be annotated.
 
     location
-      Either (start, end) or (start, end, strand). (strand defaults to +1)
+      Either (start, end) or (start, end, strand). (strand defaults to +1).
 
     feature_type
-      The type associated with the feature
+      The type associated with the feature.
 
     margin
       Number of extra bases added on each side of the given location.
 
     qualifiers
-      Dictionnary that will be the Biopython feature's `qualifiers` attribute.
+      Dictionary that will be the Biopython feature's `qualifiers` attribute.
     """
 
     if location == "full":
@@ -131,26 +140,29 @@ def annotate_record(seqrecord, location="full", feature_type="feature",
         SeqFeature(
             FeatureLocation(location[0], location[1], strand),
             qualifiers=qualifiers,
-            type=feature_type
+            type=feature_type,
         )
     )
 
 
-def sanitize_string(string, max_length=15,
-                    replacements=(("'", "p"), ("*", "s"), ("-", "_"))):
+def sanitize_string(
+    string, max_length=15, replacements=(("'", "p"), ("*", "s"), ("-", "_"))
+):
     for old, new in replacements:
         string = string.replace(old, new)
-    string = re.sub(r'[^a-zA-Z\d\S]', '_', string)
+    string = re.sub(r"[^a-zA-Z\d\S]", "_", string)
     return string[:max_length]
 
 
-def sanitize_and_uniquify(strings, max_length=15,
-                          replacements=(("'", "p"), ("*", "s"), ("-", "_"))):
+def sanitize_and_uniquify(
+    strings, max_length=15, replacements=(("'", "p"), ("*", "s"), ("-", "_"))
+):
     dejavu = set()
     table = {}
     for string in strings:
-        newstring = sanitize_string(string, max_length=max_length,
-                                    replacements=replacements)
+        newstring = sanitize_string(
+            string, max_length=max_length, replacements=replacements
+        )
         i = 1
         while newstring in dejavu:
             i += 1
@@ -159,12 +171,15 @@ def sanitize_and_uniquify(strings, max_length=15,
         table[string] = newstring
     return table
 
-def write_record(record, target, fmt='genbank'):
-    """Write a record as genbank, fasta, etc. via Biopython, with fixes"""
+
+def write_record(record, target, fmt="genbank"):
+    """Write a record as genbank, fasta, etc. via Biopython, with fixes."""
     record = deepcopy(record)
     record.name = record.name[:20]
-    if str(record.seq.alphabet.__class__.__name__) != 'DNAAlphabet':
-        record.seq.alphabet = DNAAlphabet()
-    if hasattr(target, 'open'):
-        target = target.open('w')
+    if has_dna_alphabet:
+        if str(record.seq.alphabet.__class__.__name__) != "DNAAlphabet":
+            record.seq.alphabet = DNAAlphabet()
+    record.annotations["molecule_type"] = "DNA"
+    if hasattr(target, "open"):
+        target = target.open("w")
     SeqIO.write(record, target, fmt)
