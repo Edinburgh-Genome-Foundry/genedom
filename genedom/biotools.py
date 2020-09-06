@@ -38,8 +38,7 @@ def random_dna_sequence(length, probas=None, seed=None):
     seed
       The seed to feed to the random number generator. When a seed is provided
       the random results depend deterministically on the seed, thus enabling
-      reproducibility
-
+      reproducibility.
     """
     if seed is not None:
         np.random.seed(seed)
@@ -121,16 +120,16 @@ def annotate_record(
       The biopython seqrecord to be annotated.
 
     location
-      Either (start, end) or (start, end, strand). (strand defaults to +1)
+      Either (start, end) or (start, end, strand). (strand defaults to +1).
 
     feature_type
-      The type associated with the feature
+      The type associated with the feature.
 
     margin
       Number of extra bases added on each side of the given location.
 
     qualifiers
-      Dictionnary that will be the Biopython feature's `qualifiers` attribute.
+      Dictionary that will be the Biopython feature's `qualifiers` attribute.
     """
 
     if location == "full":
@@ -174,7 +173,7 @@ def sanitize_and_uniquify(
 
 
 def write_record(record, target, fmt="genbank"):
-    """Write a record as genbank, fasta, etc. via Biopython, with fixes"""
+    """Write a record as genbank, fasta, etc. via Biopython, with fixes."""
     record = deepcopy(record)
     record.name = record.name[:20]
     if has_dna_alphabet:

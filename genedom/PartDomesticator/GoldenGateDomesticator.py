@@ -16,49 +16,50 @@ from dnachisel import (
 from ..StandardDomesticatorsSet import StandardDomesticatorsSet
 from .PartDomesticator import PartDomesticator
 
+
 def nan_to_empty_string(val):
     """Return the value unless it is NaN, then it returns an empty string."""
     return val if (isinstance(val, str) or not np.isnan(val)) else ""
 
 
 class GoldenGateDomesticator(PartDomesticator):
-    """Special domesticator class for Golden-Gate standards
-    
+    """Special domesticator class for Golden-Gate standards.
+
     Parameters
     ----------
 
     left_overhang
-      4bp overhang to be added on the left
-    
+      4bp overhang to be added on the left.
+
     right_overhang
-      4bp overhang to be added on the right
-    
+      4bp overhang to be added on the right.
+
     left_addition
       Extra sequence of DNA to be systematically added on the left of each part
       between the enzyme site and the rest of the sequence.
-    
+
     right_addition
       Extra sequence to be systematically added on the right of each part
       between the enzyme site and the rest of the sequence.
-    
+
     enzyme
       Enzyme used for the Golden Gate assembly. This enzyme will be added on
       the flanks of the sequence, and the internal sequence will be protected
       against sites from this enzyme during optimization.
-    
+
     extra_avoided_sites
       Other enzymes from which the sequence should be protected during
       optimization in addition to the assembly ``enzyme``.
-    
+
     description
       Description of the domesticator as it will appear in reports.
-    
+
     name
-      Name of the domesticator as it will appear in reports
+      Name of the domesticator as it will appear in reports.
 
     constraints
       Either Dnachisel constraints or functions (sequence => constraint) to be
-      applied to the sequence for optimization
+      applied to the sequence for optimization.
 
     objectives
       Either Dnachisel objectives or functions (sequence => objective) to be
@@ -101,9 +102,7 @@ class GoldenGateDomesticator(PartDomesticator):
             (
                 lambda seq: AvoidPattern(
                     EnzymeSitePattern(enzyme),
-                    location=Location(
-                        len(left_flank), len(left_flank) + len(seq)
-                    ),
+                    location=Location(len(left_flank), len(left_flank) + len(seq)),
                 )
             )
             for enz in ([enzyme] + list(extra_avoided_sites))
@@ -157,10 +156,9 @@ class GoldenGateDomesticator(PartDomesticator):
 
         path
           Path to a CSV or XLS(X) file. A dataframe can be provided instead.
-        
+
         dataframe
-          A pandas Dataframe which can be provided instead of a path
-          
+          A pandas Dataframe which can be provided instead of a path.
         """
         if path is not None:
             if path.lower().endswith(".csv"):
@@ -175,16 +173,11 @@ class GoldenGateDomesticator(PartDomesticator):
                         GoldenGateDomesticator(
                             left_overhang=row.left_overhang,
                             right_overhang=row.right_overhang,
-                            left_addition=nan_to_empty_string(
-                                row.left_addition
-                            ),
-                            right_addition=nan_to_empty_string(
-                                row.right_addition
-                            ),
+                            left_addition=nan_to_empty_string(row.left_addition),
+                            right_addition=nan_to_empty_string(row.right_addition),
                             enzyme=row.enzyme,
                             extra_avoided_sites=[
-                                e.strip()
-                                for e in row.extra_avoided_sites.split(",")
+                                e.strip() for e in row.extra_avoided_sites.split(",")
                             ]
                             if hasattr(row.extra_avoided_sites, "split")
                             else [],

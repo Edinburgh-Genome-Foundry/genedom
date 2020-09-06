@@ -26,20 +26,19 @@ class PartDomesticator:
 
     name
       Domesticator name as it will appear in reports etc.
-  
+
     description
       Short domesticator description as it will appear in reports etc.
 
     left_flank
-      String. Left addition to the sequence (homology arms, enzymes sites etc.)
-
+      String. Left addition to the sequence (homology arms, enzymes sites etc).
 
     right_flank
-      String. Right addition to the sequence (homology arms, enz. sites etc.)
+      String. Right addition to the sequence (homology arms, enz. sites etc).
 
     constraints
       Either Dnachisel constraints or functions (sequence => constraint) to be
-      applied to the sequence for optimization
+      applied to the sequence for optimization.
 
     objectives
       Either Dnachisel objectives or functions (sequence => objective) to be
@@ -134,7 +133,7 @@ class PartDomesticator:
           function (dna_sequence => DnaChisel constraint).
 
         final_record_target
-          Path to the file where to write the final genbank
+          Path to the file where to write the final genbank.
 
         edit
           Turn to True to allow sequence edits (if it is false and no all
@@ -143,7 +142,7 @@ class PartDomesticator:
 
         report_target
           Target for the sequence optimization report (a folder path, or a zip
-          path)
+          path).
 
         barcode
           A sequence of DNA that will be added to the left of the sequence once
@@ -265,10 +264,7 @@ class PartDomesticator:
     def html_details(self):
         """HTML representation of the ``details_list``, for reports."""
         return "<br />".join(
-            [
-                "<b>%s</b>: %s" % (name, value)
-                for (name, value) in self.details_list()
-            ]
+            ["<b>%s</b>: %s" % (name, value) for (name, value) in self.details_list()]
         )
 
     @staticmethod
