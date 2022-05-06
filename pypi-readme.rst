@@ -2,9 +2,9 @@
 Genedom
 =======
 
-.. image:: https://travis-ci.org/Edinburgh-Genome-Foundry/genedom.svg?branch=master
-   :target: https://travis-ci.org/Edinburgh-Genome-Foundry/genedom
-   :alt: Travis CI build status
+.. image:: https://github.com/Edinburgh-Genome-Foundry/genedom/actions/workflows/build.yml/badge.svg
+    :target: https://github.com/Edinburgh-Genome-Foundry/genedom/actions/workflows/build.yml
+    :alt: GitHub CI build status
 
 .. image:: https://coveralls.io/repos/github/Edinburgh-Genome-Foundry/genedom/badge.svg?branch=master
    :target: https://coveralls.io/github/Edinburgh-Genome-Foundry/genedom?branch=master
@@ -28,7 +28,7 @@ Infos
 **License:** MIT, Copyright Edinburgh Genome Foundry
 
 More biology software
------------------------
+---------------------
 
 .. image:: https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/Edinburgh-Genome-Foundry.github.io/master/static/imgs/logos/egf-codon-horizontal.png
   :target: https://edinburgh-genome-foundry.github.io/
