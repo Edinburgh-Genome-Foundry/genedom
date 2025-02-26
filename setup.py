@@ -4,13 +4,15 @@ ez_setup.use_setuptools()
 
 from setuptools import setup, find_packages
 
-exec(open("genedom/version.py").read())  # loads __version__
+version = {}
+with open("genedom/version.py") as fp:
+    exec(fp.read(), version)
 
 setup(
     name="genedom",
-    version=__version__,
+    version=version["__version__"],
     author="Zulko",
-    description="Genetic parts standardization",
+    description="Genetic part standardization",
     long_description=open("pypi-readme.rst").read(),
     license="MIT",
     url="https://github.com/Edinburgh-Genome-Foundry/genedom",
