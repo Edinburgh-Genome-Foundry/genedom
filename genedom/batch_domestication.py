@@ -41,6 +41,7 @@ def batch_domestication(
     barcode_order="same_as_records",
     barcode_spacer="AA",
     logger="bar",
+    max_length=20
 ):
     """Domesticate a batch of parts according to some domesticator/standard.
     
@@ -115,7 +116,13 @@ def batch_domestication(
 
     logger
       Either "bar" or None for no logger or any Proglog ProgressBarLogger.
+
+    max_length
+      The maximum length of the name of the sequences. Some DNA synthesis companies
+      require names to be below a certain length.
     """
+    # max_length's default value is a common requirement of DNA synthesis companies,
+    # arising from the Genbank format's limitations.
     non_unique_record_ids = detect_non_unique_elements([r.id for r in records])
     if len(non_unique_record_ids):
         raise ValueError(
@@ -230,7 +237,7 @@ def batch_domestication(
 
     # WRITE PDF REPORT
 
-    sanitizing_table = sanitize_and_uniquify([info["id"] for info in infos])
+    sanitizing_table = sanitize_and_uniquify([info["id"] for info in infos], max_length=max_length)
     order_id_dataframe = pandas.DataFrame(
         list(sanitizing_table.items()), columns=["sequence", "order_id"]
     )

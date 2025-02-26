@@ -157,7 +157,7 @@ def sanitize_string(
 
 
 def sanitize_and_uniquify(
-    strings, max_length=15, replacements=(("'", "p"), ("*", "s"), ("-", "_"))
+    strings, max_length, replacements=(("'", "p"), ("*", "s"), ("-", "_"))
 ):
     dejavu = set()
     table = {}
