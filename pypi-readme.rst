@@ -9,10 +9,11 @@ Genedom
 .. image:: https://coveralls.io/repos/github/Edinburgh-Genome-Foundry/genedom/badge.svg?branch=master
    :target: https://coveralls.io/github/Edinburgh-Genome-Foundry/genedom?branch=master
 
-GeneDom is a python library for managing the domestication of genetic parts so that they will comply to a genetic assembly standard. It puts together a `sequence optimizer <https://github.com/Edinburgh-Genome-Foundry/DnaChisel>`_, genetic standards data, and a reporting system, to automate the domestication of large batches in an easy and human-friendly way.
+Genedom is a Python package for managing the domestication of genetic parts, which means
+modifying their sequences to make them compatible with a given genetic assembly standard.
 
-Infos
------
+Info
+----
 
 **PIP installation:**
 
@@ -25,7 +26,8 @@ Infos
 `<https://github.com/Edinburgh-Genome-Foundry/genedom>`_
 
 
-**License:** MIT, Copyright Edinburgh Genome Foundry
+**License:** MIT, Copyright 2018 Edinburgh Genome Foundry, University of Edinburgh
+
 
 More biology software
 ---------------------

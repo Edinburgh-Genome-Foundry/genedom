@@ -14,11 +14,11 @@
 
 
 
-GeneDom is a python library for managing the domestication of genetic parts
-(i.e. the modification of their sequence so as to make them compatible with a
-given genetic assembly standard). Genedom binds together a
+Genedom is a Python package for managing the domestication of genetic parts,
+which means modifying their sequences to make them compatible with a given
+genetic assembly standard. Genedom binds together a
 `sequence optimizer <https://github.com/Edinburgh-Genome-Foundry/DnaChisel>`_,
-genetic standards informations, and a reporting routine, to automate the
+information on the genetic standard, and a reporting routine to automate the
 domestication of large batches in an easy and human-friendly way.
 
 .. raw:: html
@@ -30,20 +30,20 @@ domestication of large batches in an easy and human-friendly way.
 
 Features include:
 
-- Possibility to define part domesticators with added right-hand and left-hand
-  nucleotide, hard constraints on the sequence (such as absence of a restriction
+- User-defined part domesticators with extra nucleotides optionally added to both ends,
+  hard constraints on the sequence (such as enforcing absence of a restriction
   site) and optimization objectives (such as codon optimization).
 - Built-in pre-defined domesticators for popular genetic assembly standards
   (well, only EMMA at the moment).
-- Possibility to generate and attribute barcodes that will be added to the
-  sequence (but won't be in final constructs) in order to easily check
-  that this is the right part in the future in case of label mix-up. 
-- Routine for mass-domesticating sequences with report generation, including
+- Generation of barcodes that can be added to the sequence
+  (but won't be in final constructs). This allows easy verification of a sequence file
+  or a DNA sample (e.g. in case of label mix-up).
+- Routine for batch-domesticating sequences with report generation, including
   reports on each sequence optimization, spreadsheets of parts, ready-to-order FASTA
-  records of the parts, and a summary report to quickly verify everything, with a
-  list of every domesticator used, for traceability.
+  and Genbank files of the parts, and a summary report to quickly verify everything,
+  with a list of every domesticator used, for traceability.
 
-Here is an example of summary report:
+An example summary report:
 
 .. raw:: html
 
@@ -53,7 +53,7 @@ Here is an example of summary report:
     </p>
 
 
-You can also use Genedom online via `this web app <https://cuba.genomefoundry.org/domesticate_part_batches>`_.
+You can also use Genedom online via EGF's `Domesticate Part Batches web app <https://cuba.genomefoundry.org/domesticate_part_batches>`_.
 
 Usage examples
 --------------
@@ -75,7 +75,7 @@ Simple domestication of one part
 Generating a collection of 20bp barcodes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(see docs for more potions)
+(see docs for more options)
 
 .. code:: python
 
@@ -124,7 +124,9 @@ Alternatively, you can unzip the sources in a folder and type:
 License = MIT
 -------------
 
-Genedom is an open-source software originally written at the `Edinburgh Genome Foundry
-<http://www.genomefoundry.org>`_ by `Zulko <https://github.com/Zulko>`_
-and `released on Github <https://github.com/Edinburgh-Genome-Foundry/genedom>`_ under the MIT license (Copyright 2018 Edinburgh Genome Foundry).
-Everyone is welcome to contribute !
+Genedom is a free/libre and open-source software
+`released on Github <https://github.com/Edinburgh-Genome-Foundry/genedom>`_ under
+the MIT license (Copyright 2018 Edinburgh Genome Foundry, University of Edinburgh).
+It was originally written by `Zulko <https://github.com/Zulko>`_ and is currently
+being developed by `Peter Vegh <https://github.com/veghp>`_.
+Everyone is welcome to `contribute <https://github.com/Edinburgh-Genome-Foundry/HowTo/blob/master/EGF/CONTRIBUTING.md>`_!
