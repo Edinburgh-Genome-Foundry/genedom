@@ -147,7 +147,7 @@ class GoldenGateDomesticator(PartDomesticator):
     def standard_from_spreadsheet(path=None, dataframe=None, name_prefix=""):
         """Parse a spreadsheet into a standard with Golden Gate domesticators.
 
-        The input should be a table with columns names as follows:
+        The input should be a table with the following column names:
         slot_name, left_overhang, right_overhang, left_addition,
         right_addition, enzyme, extra_avoided_sites, description.
 
@@ -165,6 +165,12 @@ class GoldenGateDomesticator(PartDomesticator):
                 dataframe = pandas.read_csv(path)
             else:
                 dataframe = pandas.read_excel(path)
+        if dataframe['slot_name'].str.contains(r'\s+').any():
+            raise ValueError("Whitespace in slot_name column!")
+        if dataframe['left_overhang'].str.contains(r'\s+').any():
+            raise ValueError("Whitespace in left_overhang column!")
+        if dataframe['right_overhang'].str.contains(r'\s+').any():
+            raise ValueError("Whitespace in right_overhang column!")
         return StandardDomesticatorsSet(
             OrderedDict(
                 [
