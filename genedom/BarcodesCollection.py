@@ -96,7 +96,7 @@ class BarcodesCollection(OrderedDict):
                     tmax=barcode_tmax,
                     max_homology_length=max_homology_length,
                     avoid_heterodim_with=None,
-                    max_heterodim_tm=5,
+                    max_heterodim_tm=heterodim_tmax,
                     location=(start, end - len(spacer)),
                 ),
                 EnforceSequence(spacer, location=(end - len(spacer), end)),
