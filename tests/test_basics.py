@@ -77,7 +77,5 @@ def test_that_constraints_in_records_are_accounted_for():
     emma = BUILTIN_STANDARDS["EMMA"]
     p7 = emma.domesticators["p7"]
     result = p7.domesticate(rec)
-    seq_after = str(
-        result.record_after[len(p7.left_flank) : -len(p7.right_flank)].seq
-    )
+    seq_after = str(result.record_after[len(p7.left_flank) : -len(p7.right_flank)].seq)
     assert translate(seq_after) == translate(sequence)
