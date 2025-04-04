@@ -41,10 +41,10 @@ def batch_domestication(
     barcode_order="same_as_records",
     barcode_spacer="AA",
     logger="bar",
-    max_length=20
+    max_length=20,
 ):
     """Domesticate a batch of parts according to some domesticator/standard.
-    
+
     Examples
     --------
 
@@ -211,7 +211,8 @@ def batch_domestication(
         domesticated_records.append(domestication_results.record_after)
         if include_original_records:
             write_record(
-                record, original_dir._file(original_id + ".gb"),
+                record,
+                original_dir._file(original_id + ".gb"),
             )
         n_edits = domestication_results.number_of_edits()
         added_bp = len(domestication_results.record_after) - len(record)
@@ -225,9 +226,11 @@ def batch_domestication(
                 "id": original_id,
                 "Record": before_seqicon + original_id,
                 "Domesticator": record_domesticator.name,
-                "Domesticated Record": ("Failed: " + domestication_results.message)
-                if not domestication_results.success
-                else (after_seqicon + domesticated_id),
+                "Domesticated Record": (
+                    ("Failed: " + domestication_results.message)
+                    if not domestication_results.success
+                    else (after_seqicon + domesticated_id)
+                ),
                 "Added bp": added_bp,
                 "Edited bp": n_edits,
             }
@@ -237,7 +240,9 @@ def batch_domestication(
 
     # WRITE PDF REPORT
 
-    sanitizing_table = sanitize_and_uniquify([info["id"] for info in infos], max_length=max_length)
+    sanitizing_table = sanitize_and_uniquify(
+        [info["id"] for info in infos], max_length=max_length
+    )
     order_id_dataframe = pandas.DataFrame(
         list(sanitizing_table.items()), columns=["sequence", "order_id"]
     )

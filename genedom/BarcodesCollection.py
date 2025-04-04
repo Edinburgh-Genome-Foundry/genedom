@@ -134,7 +134,7 @@ class BarcodesCollection(OrderedDict):
     def to_records(self, path=None):
         """Return (optionally write) individual Genbanks of the barcodes."""
         records = []
-        for (name, barcode) in self.items():
+        for name, barcode in self.items():
             record = sequence_to_record(barcode)
             record.id = name
             annotate_record(record, label=name)
