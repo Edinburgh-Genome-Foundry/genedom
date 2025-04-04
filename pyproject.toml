@@ -1,0 +1,32 @@
+[project]
+name = "genedom"
+version = "0.2.0"
+license = "MIT"
+authors = [{ name = "Zulko" }]
+description = "Genetic part standardization"
+readme = "pypi-readme.rst"
+keywords = ["genetic", "DNA", "part", "standardization", "synthetic biology"]
+dependencies = [
+  "dnachisel[reports]",
+  "snapgene_reader",
+  "pdf_reports",
+  "pandas",
+  "dna_features_viewer",
+  "python-box",
+  "openpyxl",
+  "flametree",
+  "sequenticon",
+]
+
+[project.urls]
+Homepage = "https://github.com/Edinburgh-Genome-Foundry/genedom"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = ["docs"]

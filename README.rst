@@ -114,12 +114,6 @@ You can install Genedom through PIP:
 
     pip install genedom
 
-Alternatively, you can unzip the sources in a folder and type:
-
-.. code:: shell
-
-    python setup.py install
-
 
 License = MIT
 -------------
