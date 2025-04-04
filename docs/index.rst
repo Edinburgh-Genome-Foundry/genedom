@@ -1,7 +1,7 @@
 .. raw:: html
 
     <p align="center">
-    <img alt="logo" title="genedom Logo" src="https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/genedom/master/docs/logo.png" width="550">
+    <img alt="logo" title="genedom Logo" src="https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/genedom/master/genedom/reports_assets/imgs/logo.png" width="550">
     <br /><br />
     </p>
 
@@ -14,7 +14,7 @@
 
 
 
-GeneDom is a python library for managing the domestication of genetic parts
+Genedom is a python library for managing the domestication of genetic parts
 (i.e. the modification of their sequence so as to make them compatible with a
 given genetic assembly standard). Genedom binds together a
 `sequence optimizer <https://github.com/Edinburgh-Genome-Foundry/DnaChisel>`_,
@@ -53,13 +53,14 @@ Here is an example of summary report:
     </p>
 
 
-You can also use Genedom online via ``this web app <https://cuba.genomefoundry.org/domesticate_part_batches>``_.
+You can also use Genedom online via `this web app <https://cuba.genomefoundry.org/domesticate_part_batches>`_.
+
 
 Usage examples
----------------
+--------------
 
 Simple domestication of one part
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -87,6 +88,7 @@ Generating a collection of 20bp barcodes
 
     barcodes_collection.to_fasta('example_barcodes_collection.fa')
 
+
 Domesticating a batch of parts with PDF report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -103,9 +105,9 @@ Domesticating a batch of parts with PDF report
                         barcodes=barcodes,  # optional
                         standard=BUILTIN_STANDARDS.EMMA)
 
-Installation
--------------
 
+Installation
+------------
 
 You can install Genedom through PIP (coming soon)
 
@@ -113,36 +115,30 @@ You can install Genedom through PIP (coming soon)
 
     sudo pip install geneblocks
 
-Alternatively, you can unzip the sources in a folder and type
-
-.. code:: shell
-
-    sudo python setup.py install
-
 
 Licence
---------
+-------
 
 Genedom is an open-source software originally written at the `Edinburgh Genome Foundry
 <http://www.genomefoundry.org>`_ by `Zulko <https://github.com/Zulko>`_
-and `released on Github <https://github.com/Edinburgh-Genome-Foundry/genedom>`_ under the MIT licence (copyright Edinburgh Genome Foundry).
-Everyone is welcome to contribute !
+and `released on Github <https://github.com/Edinburgh-Genome-Foundry/genedom>`_ under the MIT licence (Copyright 2018 Edinburgh Genome Foundry, University of Edinburgh).
+Everyone is welcome to contribute!
+
 
 More biology software
------------------------
+---------------------
 
 .. image:: https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/Edinburgh-Genome-Foundry.github.io/master/static/imgs/logos/egf-codon-horizontal.png
  :target: https://edinburgh-genome-foundry.github.io/
 
-Saboteurs is part of the `EGF Codons <https://edinburgh-genome-foundry.github.io/>`_ synthetic biology software suite for DNA design, manufacturing and validation.
+Genedom is part of the `EGF Codons <https://edinburgh-genome-foundry.github.io/>`_ synthetic biology software suite for DNA design, manufacturing and validation.
 
 
-.. toctree::
-    :hidden:
-    :maxdepth: 3
+.. .. toctree::
+..     :hidden:
+..     :maxdepth: 3
 
-    self
-
+..     self
 
 .. toctree::
    :hidden:

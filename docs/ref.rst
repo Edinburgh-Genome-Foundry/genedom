@@ -1,23 +1,55 @@
-.. _reference:
+API reference
+=============
 
-Saboteurs - Reference manual
-============================
+Domesticators
+-------------
 
-Logical methods
-~~~~~~~~~~~~~~~~
+.. autoclass:: genedom.PartDomesticator
+   :members:
 
-.. automethod:: saboteurs.logical_methods.find_logical_saboteurs
-.. automethod:: saboteurs.logical_methods.design_test_batch
-.. automethod:: saboteurs.logical_methods.plot_batch
-.. automethod:: saboteurs.logical_methods.generate_batch_report
+.. autoclass:: genedom.GoldenGateDomesticator
+   :members:
 
-Statistical methods
-~~~~~~~~~~~~~~~~~~~
 
-.. automethod:: saboteurs.statistical_methods.find_statistical_saboteurs
-.. automethod:: saboteurs.statistical_methods.statistics_report
+Standards
+---------
+
+.. autoclass:: genedom.StandardDomesticatorsSet
+   :members:
+
+
+Batch domestication
+-------------------
+
+.. autofunction:: genedom.batch_domestication
+
+
+BarcodesCollection
+------------------
+
+.. autoclass:: genedom.BarcodesCollection
+   :members:
+
+
+Report
+------
+
+.. autofunction:: genedom.write_pdf_domestication_report
+
 
 Tools
-~~~~~
+-----
 
-.. automethod:: saboteurs.tools.csv_to_groups_data
+.. autofunction:: genedom.load_record
+
+.. autofunction:: genedom.load_records
+
+.. autofunction:: genedom.write_record
+
+.. autofunction:: genedom.random_dna_sequence
+
+
+.. .. automodule:: genedom
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:
