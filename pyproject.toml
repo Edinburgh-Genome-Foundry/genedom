@@ -29,4 +29,7 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["docs"]
+exclude = ["docs*", "examples*", "tests*"]
+
+[tool.setuptools.package-data]
+genedom = ["assembly_standards/*", "reports_assets/*", "reports_assets/imgs/*"]
